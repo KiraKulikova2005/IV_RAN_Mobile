@@ -123,7 +123,7 @@ fun RegistrationScreen(
             passwordState,
             secondPasswordState = secondPasswordState,
             onValueChange = {
-                newValue -> secondPasswordState.value = newValue
+                    newValue -> secondPasswordState.value = newValue
                 updatePasswordMatchState()
             },
         )
@@ -194,6 +194,4 @@ fun RegistrationScreen(
         }
 
     }
-
-
 }

@@ -21,9 +21,6 @@ fun BookmarksScreen(authViewModel: AuthVM) {
     val tabItems = listOf(
         stringResource(R.string.bookmarks),
         "Скульптуринг",
-        "Скульптуринг",
-        "Скульптуринг",
-        "Скульптуринг",
         "Ландшафты"
     )
     var selectedTabIndex by remember { mutableIntStateOf(0) }
