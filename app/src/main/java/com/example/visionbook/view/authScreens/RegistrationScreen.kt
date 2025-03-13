@@ -10,10 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -25,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -42,6 +40,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.Thread.sleep
+
 
 
 @Composable
@@ -140,7 +139,12 @@ fun RegistrationScreen(
                 },
                 modifier = Modifier
                     .size(50.dp)
-                    .padding(end = 10.dp)
+                    .padding(end = 10.dp),
+                colors = CheckboxDefaults.colors(
+                    checkedColor = Color(0xFF4262A2),       // Цвет галочки в активном состоянии
+                    uncheckedColor = Color(0xFF4262A2),     // Цвет рамки в неактивном состоянии
+                    checkmarkColor = Color.White     // Цвет галочки
+            )
             )
             Text(
                 stringResource(R.string.sign_up_confidence),
