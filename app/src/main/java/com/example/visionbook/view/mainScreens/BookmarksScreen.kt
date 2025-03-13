@@ -14,17 +14,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.visionbook.R
 import com.example.visionbook.viewmodels.AuthVM
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BookmarksScreen(authViewModel: AuthVM) {
-    val tabItems = listOf(
-        stringResource(R.string.bookmarks),
-        "Скульптуринг",
-        "Ландшафты"
-    )
+    val tabItems = listOf(stringResource(R.string.bookmarks))
     var selectedTabIndex by remember { mutableIntStateOf(0) }
     val pagerState = rememberPagerState { tabItems.size }
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp // Получаем ширину экрана
     LaunchedEffect(selectedTabIndex) {
         pagerState.animateScrollToPage(selectedTabIndex)
     }
@@ -33,16 +32,24 @@ fun BookmarksScreen(authViewModel: AuthVM) {
             selectedTabIndex = pagerState.currentPage
         }
     }
+
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.padding(top = 60.dp))
-        ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
-            tabItems.forEachIndexed() { index, item ->
-                Tab(selected = index + 1 == selectedTabIndex,
-                    onClick = {
-                        selectedTabIndex = index
-                    },
+        ScrollableTabRow(
+            selectedTabIndex = selectedTabIndex,
+            edgePadding = 0.dp // Убираем отступы по краям
+        ) {
+            tabItems.forEachIndexed { index, item ->
+                Tab(
+                    modifier = Modifier.width(screenWidth), // Фиксируем ширину вкладки
+                    selected = index == selectedTabIndex,
+                    onClick = { selectedTabIndex = index },
                     text = {
-                        Text(item)
+                        Text(
+                            text = item,
+                            modifier = Modifier.fillMaxWidth(), // Заполняем всю ширину
+                            textAlign = TextAlign.Center // Выравниваем текст по центру
+                        )
                     }
                 )
             }

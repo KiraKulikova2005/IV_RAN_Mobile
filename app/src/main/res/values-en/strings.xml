@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="search">Search…</string>
-    <string name="topbar_agitation">Let\'s start creating with AI?</string>
+    <string name="topbar_agitation">Search</string>
 
     <string name="genre">Genre</string>
     <string name="author">Author</string>

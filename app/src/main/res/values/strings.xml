@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name" translatable="false">VisionBook</string>
+    <string name="app_name" translatable="false">ИВ РАН</string>
     <string name="search">Поиск…</string>
-    <string name="topbar_agitation">Начнем творить вместе с ИИ?</string>
+    <string name="topbar_agitation">Поиск</string>
 
     <string name="genre">Жанр</string>
     <string name="author">Автор книги</string>
@@ -27,7 +27,7 @@
     <string name="premaincamera_newbook_continue">Продолжить</string>
     <string name="premaincamera_newbook_back">Назад</string>
 
-    <string name="bookmarks">Избранное</string>
+    <string name="bookmarks">Редактор</string>
 
     <string name="sign_in_title">Войдите в аккаунт</string>
     <string name="sign_in_email" translatable="false">Email</string>

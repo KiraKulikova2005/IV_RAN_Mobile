@@ -52,7 +52,7 @@ fun BooksScreen(
     // val activeState = remember { mutableStateOf(false) }
 
     val bookListState = remember { mutableStateOf<List<BooksModel>?>(null) }
-    val tabItems = listOf(stringResource(R.string.books_screen_tab_b), stringResource(R.string.books_screen_tab_h))
+    val tabItems = listOf(stringResource(R.string.books_screen_tab_h))
     val amount = 30
     /* val items = remember {
          mutableListOf(
