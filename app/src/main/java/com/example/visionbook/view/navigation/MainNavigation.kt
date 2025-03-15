@@ -19,15 +19,15 @@ fun MainNavigation(navController: NavHostController, onThemeUpdated: () -> Unit,
         composable(NavigationItems.Home.route) {
             HomeScreen(navController, authViewModel)
         }
-        composable(NavigationItems.Books.route) {
-            BooksScreen(authViewModel = authViewModel)
-        }
+        //composable(NavigationItems.Books.route) {
+        //    BooksScreen(authViewModel = authViewModel)
+        //}
         composable(NavigationItems.CameraInMain.route) {
             PreMainCameraScreen(navController = navController, authViewModel = authViewModel)
         }
-        composable(NavigationItems.Bookmarks.route) {
-            BookmarksScreen(authViewModel)
-        }
+        //composable(NavigationItems.Bookmarks.route) {
+        //    BookmarksScreen(authViewModel)
+        //}
         composable(NavigationItems.Profile.route) {
             SettingsProfileScreen(navController, onThemeUpdated, authViewModel = authViewModel)
         }

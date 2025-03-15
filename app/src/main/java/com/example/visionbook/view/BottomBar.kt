@@ -37,9 +37,9 @@ fun AnimatedBottomNavigationBar(
 private fun BottomNavigationBar(navController: NavController) {
     val items = listOf(
         NavigationItems.Home,
-        NavigationItems.Books,
+        //NavigationItems.Books,
         NavigationItems.CameraInMain,
-        NavigationItems.Bookmarks,
+        //NavigationItems.Bookmarks,
         NavigationItems.Profile,
     )
     NavigationBar(
