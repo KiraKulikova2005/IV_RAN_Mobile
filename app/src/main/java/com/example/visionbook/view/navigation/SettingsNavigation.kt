@@ -20,6 +20,9 @@ fun NavGraphBuilder.settingsNavigation(navController: NavHostController, authVie
         composable(SettingsScreen.Notification.route) {
             NotificationScreen(navController)
         }
+        composable(SettingsScreen.FAQ.route) {
+            FAQScreen(navController)
+        }
         composable(SettingsScreen.Security.route) {
             SecurityScreen(navController)
         }
@@ -27,10 +30,6 @@ fun NavGraphBuilder.settingsNavigation(navController: NavHostController, authVie
         composable(SettingsScreen.Language.route) {
             LanguageScreen(navController)
         }
-        composable(SettingsScreen.FAQ.route) {
-            FAQScreen(navController)
-        }
-
         composable(NavigationItems.CameraInProfile.route) {
             PreProfileCameraScreen(navController)
         }
@@ -39,9 +38,9 @@ fun NavGraphBuilder.settingsNavigation(navController: NavHostController, authVie
 }
 
 sealed class SettingsScreen(val route: String) {
+    object FAQ : SettingsScreen("FAQ")
     object Notification : SettingsScreen("NOTIFICATION")
     object Security : SettingsScreen("SECURITY")
     object Language : SettingsScreen("LANGUAGE")
-    object FAQ : SettingsScreen("FAQ")
     object ProfileSettings : SettingsScreen("PROFILESETTINGS")
 }

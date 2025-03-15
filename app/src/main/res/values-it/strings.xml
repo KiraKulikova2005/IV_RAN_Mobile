@@ -12,7 +12,7 @@
     <string name="profile_settings">Impostazioni del profilo</string>
     <string name="notification">Notifiche</string>
     <string name="security">Sicurezza</string>
-    <string name="language">Lingua</string>
+    <string name="exit">Выход</string>
     <string name="exit_profile">Esci dal profilo</string>
 
     <string name="permission_canceled">Permesso negato</string>

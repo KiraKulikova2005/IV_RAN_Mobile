@@ -42,7 +42,7 @@ fun NotificationScreen(navController: NavController) {
             NotificationSettingsItem(stringResource(R.string.notset_mention), stringResource(R.string.profile_settings)),
             NotificationSettingsItem(stringResource(R.string.notset_newsub), stringResource(R.string.notification)),
             NotificationSettingsItem(stringResource(R.string.notset_recom), stringResource(R.string.security)),
-            NotificationSettingsItem(stringResource(R.string.notset_interestpost), stringResource(R.string.language)),
+            NotificationSettingsItem(stringResource(R.string.notset_interestpost), stringResource(R.string.exit)),
             NotificationSettingsItem(stringResource(R.string.notset_interestgenre), stringResource(R.string.faq)),
             NotificationSettingsItem(stringResource(R.string.notset_populargenre), stringResource(R.string.faq)),
         )

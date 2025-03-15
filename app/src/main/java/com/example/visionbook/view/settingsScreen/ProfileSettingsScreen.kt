@@ -56,7 +56,7 @@ fun ProfileSettingsScreen(navController: NavController) {
             ProfileSettingsItem("О себе", stringResource(R.string.profile_settings)),
             ProfileSettingsItem("Дата рождения", stringResource(R.string.notification)),
             ProfileSettingsItem("Страна/город", stringResource(R.string.security)),
-            ProfileSettingsItem("Адресс эл. почты", stringResource(R.string.language)),
+            ProfileSettingsItem("Адресс эл. почты", stringResource(R.string.exit)),
             ProfileSettingsItem("Пароль", stringResource(R.string.faq)),
             ProfileSettingsItem("Выход из профиля", stringResource(R.string.faq)),
         )

@@ -19,7 +19,6 @@ import com.example.visionbook.R
 import com.example.visionbook.data.MenuItem
 import com.example.visionbook.models.AutoresizedText
 import com.example.visionbook.models.NavigationItems
-import com.example.visionbook.view.navigation.AuthScreen
 import com.example.visionbook.view.navigation.GraphRoute
 import com.example.visionbook.view.navigation.SettingsScreen
 import com.example.visionbook.viewmodels.AuthVM
@@ -98,14 +97,14 @@ fun SettingsProfileScreen(
                     "Profile Settings",
                     stringResource(R.string.profile_settings)
                 ),
+                MenuItem(R.drawable.faq, "FAQ", stringResource(R.string.faq)),
+                MenuItem(R.drawable.safety, "Security", stringResource(R.string.security)),
                 MenuItem(
                     R.drawable.notification,
                     "Notification",
                     stringResource(R.string.notification)
                 ),
-                MenuItem(R.drawable.safety, "Security", stringResource(R.string.security)),
-                MenuItem(R.drawable.language, "Language", stringResource(R.string.language)),
-                MenuItem(R.drawable.faq, "FAQ", stringResource(R.string.faq)),
+                MenuItem(R.drawable.language, "Exit", stringResource(R.string.exit)),
             )
 
             menuItems.forEach { menuItem ->

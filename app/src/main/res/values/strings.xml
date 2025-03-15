@@ -10,9 +10,9 @@
 
     <string name="theme">Цветовая тема</string>
     <string name="profile_settings">Настройки профиля</string>
-    <string name="notification">Уведомления</string>
+    <string name="notification">Поддержка</string>
     <string name="security">Безопасность</string>
-    <string name="language">Язык</string>
+    <string name="exit">Выход</string>
     <string name="faq" translatable="false">FAQ</string>
     <string name="exit_profile">Выход из профиля</string>
 

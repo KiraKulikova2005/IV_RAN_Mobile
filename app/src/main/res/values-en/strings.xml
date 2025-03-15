@@ -12,7 +12,7 @@
     <string name="profile_settings">Profile settings</string>
     <string name="notification">Notification</string>
     <string name="security">Security</string>
-    <string name="language">Language</string>
+    <string name="exit">Exit</string>
     <string name="exit_profile">Exit profile</string>
 
     <string name="permission_canceled">Permission denied</string>
