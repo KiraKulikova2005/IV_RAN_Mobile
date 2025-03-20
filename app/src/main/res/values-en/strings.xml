@@ -48,4 +48,6 @@
     <string name="preprofilecamera_btTakephoto">Take photo</string>
 
 
+    <string name="prof_name">Иванов И.И.</string>
+    <string name="nfc_enter">Войти по NFC-метке</string>
 </resources>

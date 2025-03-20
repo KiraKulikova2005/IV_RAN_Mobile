@@ -1,5 +1,6 @@
 package com.example.visionbook.view.mainScreens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,6 +20,8 @@ import com.example.visionbook.R
 import com.example.visionbook.data.MenuItem
 import com.example.visionbook.models.AutoresizedText
 import com.example.visionbook.models.NavigationItems
+import com.example.visionbook.view.authScreens.LoginScreen
+import com.example.visionbook.view.navigation.AuthScreen
 import com.example.visionbook.view.navigation.GraphRoute
 import com.example.visionbook.view.navigation.SettingsScreen
 import com.example.visionbook.viewmodels.AuthVM
@@ -51,8 +54,9 @@ fun SettingsProfileScreen(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = firstProfile?.url, "Avatar",
+                Image(
+                    painter = painterResource(R.drawable.logo),
+                    contentDescription = "Avatar",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .padding(top = 10.dp, bottom = 10.dp, start = 15.dp)
@@ -62,7 +66,7 @@ fun SettingsProfileScreen(
 
                 firstProfile?.nickname?.let {
                     AutoresizedText(
-                        it,
+                        stringResource(R.string.prof_name),
                         modifier = Modifier.padding(start = 50.dp),
                         style = MaterialTheme.typography.labelMedium
                     )
@@ -147,8 +151,8 @@ fun MenuButton(
                     navController.navigate(SettingsScreen.Security.route)
                 }
 
-                "Language" -> {
-                    navController.navigate(SettingsScreen.Language.route)
+                "Exit" -> {
+                    navController.navigate(AuthScreen.Login.route)
                 }
 
                 "FAQ" -> {

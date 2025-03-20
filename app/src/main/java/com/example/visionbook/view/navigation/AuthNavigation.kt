@@ -6,6 +6,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.visionbook.view.authScreens.ForgotScreen
 import com.example.visionbook.view.authScreens.LoginScreen
+import com.example.visionbook.view.authScreens.NFCScreen
 import com.example.visionbook.view.authScreens.RegistrationScreen
 import com.example.visionbook.viewmodels.AuthVM
 
@@ -23,6 +24,9 @@ fun NavGraphBuilder.authNavigation(navController: NavHostController, authViewMod
         composable(AuthScreen.Forgot.route) {
             ForgotScreen(navController, authViewModel)
         }
+        composable(AuthScreen.NFC.route) {
+            NFCScreen(navController)
+        }
     }
 }
 
@@ -30,4 +34,5 @@ sealed class AuthScreen(val route: String) {
     object Login : AuthScreen("LOGIN")
     object Registration : AuthScreen("REGISTRATION")
     object Forgot : AuthScreen("FORGOT")
+    object NFC : AuthScreen("NFC")
 }

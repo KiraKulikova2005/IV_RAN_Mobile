@@ -145,6 +145,15 @@ fun LoginScreen(
             )
         }
 
+        Text(
+            stringResource(R.string.nfc_enter),
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .padding(top = 10.dp, bottom = 80.dp)
+                .clickable { navController.navigate(AuthScreen.NFC.route) }
+        )
+
     }
 
 }

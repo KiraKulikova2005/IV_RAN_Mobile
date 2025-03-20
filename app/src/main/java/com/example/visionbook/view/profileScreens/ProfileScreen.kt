@@ -11,6 +11,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.Image
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -33,13 +34,15 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileScreenVM = vie
         ) {
             BackButton(navController = navController)
         }
-        AsyncImage(model = firstProfile?.url, "Avatar",
+        Image(
+            painter = painterResource(R.drawable.logo),
+            contentDescription = "Avatar",
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(180.dp).clip(CircleShape))
         Spacer(modifier = Modifier.height(20.dp))
         firstProfile?.nickname?.let {
             AutoresizedText(
-                it,
+                stringResource(R.string.prof_name),
                 style = MaterialTheme.typography.labelMedium)
         }
         Row (

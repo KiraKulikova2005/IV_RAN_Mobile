@@ -1,5 +1,6 @@
 package com.example.visionbook.view.navigation
 
+import com.example.visionbook.view.authScreens.LoginScreen
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
@@ -26,9 +27,8 @@ fun NavGraphBuilder.settingsNavigation(navController: NavHostController, authVie
         composable(SettingsScreen.Security.route) {
             SecurityScreen(navController)
         }
-        // переделать под задел на подписки в будущем
-        composable(SettingsScreen.Language.route) {
-            LanguageScreen(navController)
+        composable(AuthScreen.Login.route) {
+            LoginScreen(navController, authViewModel)
         }
         composable(NavigationItems.CameraInProfile.route) {
             PreProfileCameraScreen(navController)
@@ -41,6 +41,6 @@ sealed class SettingsScreen(val route: String) {
     object FAQ : SettingsScreen("FAQ")
     object Notification : SettingsScreen("NOTIFICATION")
     object Security : SettingsScreen("SECURITY")
-    object Language : SettingsScreen("LANGUAGE")
     object ProfileSettings : SettingsScreen("PROFILESETTINGS")
+    object Exit : SettingsScreen("EXIT")
 }

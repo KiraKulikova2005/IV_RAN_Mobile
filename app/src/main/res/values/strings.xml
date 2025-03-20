@@ -79,6 +79,10 @@
     <string name="notset_interestgenre">Интересные жанры</string>
     <string name="notset_populargenre">Популярные жанры</string>
 
+    <string name="prof_name">Иванов И.И.</string>
+
+    <string name="nfc_enter">Войти по NFC-метке</string>
+
 
 
 
