@@ -52,10 +52,9 @@ fun ProfileSettingsScreen(navController: NavController) {
             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
         )
         val profileSettingstItems = listOf(
-            ProfileSettingsItem("Сменить пользователя", stringResource(R.string.theme)),
-            ProfileSettingsItem("О себе", stringResource(R.string.profile_settings)),
-            ProfileSettingsItem("Дата рождения", stringResource(R.string.notification)),
-            ProfileSettingsItem("Страна/город", stringResource(R.string.security)),
+            ProfileSettingsItem("ФИО", stringResource(R.string.theme)),
+            ProfileSettingsItem("Роль", stringResource(R.string.profile_settings)),
+            ProfileSettingsItem("Подразделение", stringResource(R.string.notification)),
             ProfileSettingsItem("Адресс эл. почты", stringResource(R.string.exit)),
             ProfileSettingsItem("Пароль", stringResource(R.string.faq)),
             ProfileSettingsItem("Выход из профиля", stringResource(R.string.faq)),

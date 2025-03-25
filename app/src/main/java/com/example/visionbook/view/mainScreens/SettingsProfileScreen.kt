@@ -74,20 +74,6 @@ fun SettingsProfileScreen(
             }
         }
 
-        IconButton(
-            onClick = { navController.navigate(NavigationItems.CameraInProfile.route) },
-            modifier = Modifier
-                .padding(end = 15.dp)
-                .size(35.dp)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.add_photo),
-                "Add_photo",
-            )
-        }
-
-
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()

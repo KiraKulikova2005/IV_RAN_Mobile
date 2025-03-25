@@ -32,6 +32,8 @@ import com.example.visionbook.models.api.AuthApi
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldEmail
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldPass
+import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldFio
+import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldDep
 import com.example.visionbook.view.navigation.AuthScreen
 import com.example.visionbook.view.navigation.GraphRoute
 import com.example.visionbook.viewmodels.AuthVM
@@ -51,6 +53,8 @@ fun RegistrationScreen(
 ) {
     val context = LocalContext.current
     val authApi = retrofitViewModel.retrofit.create(AuthApi::class.java)
+    val fioState = remember { mutableStateOf("") }
+    val depState = remember { mutableStateOf("") }
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
     val secondPasswordState = remember { mutableStateOf("") }
@@ -60,6 +64,16 @@ fun RegistrationScreen(
     val checkPrivacyPolicy = stringResource(R.string.check_privacypolicy)
     val matchPass = stringResource(R.string.match_pass)
     DisposableEffect(authViewModel) {
+
+        val observerFioState = Observer<String> { _fioState ->
+            fioState.value = _fioState
+        }
+        authViewModel.fioState.observeForever(observerFioState)
+
+        val observerDepState = Observer<String> { _depState ->
+            depState.value = _depState
+        }
+        authViewModel.depState.observeForever(observerDepState)
 
         val observerEmailState = Observer<String> { _emailState ->
             emailState.value = _emailState
@@ -76,6 +90,8 @@ fun RegistrationScreen(
         }
         authViewModel.secondPasswordState.observeForever(observerSecondPasswordState)
         onDispose {
+            authViewModel.fioState.removeObserver(observerFioState)
+            authViewModel.depState.removeObserver(observerDepState)
             authViewModel.emailState.removeObserver(observerEmailState)
             authViewModel.passwordState.removeObserver(observerPasswordState)
             authViewModel.secondPasswordState.observeForever(observerSecondPasswordState)
@@ -95,15 +111,25 @@ fun RegistrationScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 80.dp)
+                .padding(bottom = 30.dp)
         ) { BackButton(navController) }
 
         AutoresizedText(
             stringResource(R.string.sign_up_title),
             style = MaterialTheme.typography.displayLarge,
-            modifier = Modifier.padding(bottom = 110.dp)
+            modifier = Modifier.padding(bottom = 60.dp)
         )
 
+        TextFieldFio(
+            stringResource(R.string.sign_in_fio),
+            fioState,
+            onValueChange = { newValue -> fioState.value = newValue })
+        Spacer(modifier = Modifier.height(15.dp))
+        TextFieldDep(
+            stringResource(R.string.sign_in_dep),
+            depState,
+            onValueChange = { newValue -> depState.value = newValue })
+        Spacer(modifier = Modifier.height(15.dp))
         TextFieldEmail(
             stringResource(R.string.sign_in_email),
             emailState,
@@ -155,11 +181,19 @@ fun RegistrationScreen(
             onClick = {
                 if (passwordsMatchState && passwordState.value != "" && emailState.value != "" && checked) {
                     CoroutineScope(Dispatchers.IO).launch {
-                        authViewModel.registration(emailState.value, passwordState.value, authApi)
+                        authViewModel.registration(
+                            emailState.value, passwordState.value, authApi.toString(),
+                            password = TODO(),
+                            authApi = TODO()
+                        )
                         sleep(1000)
                     }
                     CoroutineScope(Dispatchers.IO).launch {
-                        authViewModel.authorization(emailState.value, passwordState.value, authApi)
+                        authViewModel.authorization(
+                            emailState.value, passwordState.value, authApi.toString(),
+                            password = TODO(),
+                            authApi = TODO()
+                        )
                     }
                     navController.navigate(GraphRoute.MAIN) {
                         navController.popBackStack(AuthScreen.Login.route, true)

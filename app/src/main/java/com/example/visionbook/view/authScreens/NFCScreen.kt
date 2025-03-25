@@ -1,9 +1,15 @@
 package com.example.visionbook.view.authScreens
 
 import android.app.Activity
+import android.app.PendingIntent
+import android.content.Intent
+import android.content.IntentFilter
+import android.nfc.NdefMessage
+import android.nfc.NdefRecord
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.nfc.tech.Ndef
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,35 +29,73 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.example.visionbook.R
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
-import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
+import java.util.*
 
 @Composable
 fun NFCScreen(navController: NavController) {
     val context = LocalContext.current
     val nfcAdapter = remember { NfcAdapter.getDefaultAdapter(context) }
     var nfcMessage by remember { mutableStateOf("Ожидание NFC-метки...") }
-
     val lifecycleOwner = LocalLifecycleOwner.current
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                val activity = context as Activity
-                val intent = activity.intent
-                if (intent.action == NfcAdapter.ACTION_NDEF_DISCOVERED ||
-                    intent.action == NfcAdapter.ACTION_TECH_DISCOVERED ||
-                    intent.action == NfcAdapter.ACTION_TAG_DISCOVERED
-                ) {
-                    val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
-                    tag?.let {
-                        nfcMessage = readNfcTag(it)
-                    }
-                }
+    // Foreground Dispatch Setup
+    DisposableEffect(Unit) {
+        val activity = context as? Activity ?: return@DisposableEffect onDispose {}
+        val intent = Intent(activity, activity::class.java).apply {
+            addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        }
+        val pendingIntent = PendingIntent.getActivity(
+            activity,
+            0,
+            intent,
+            PendingIntent.FLAG_MUTABLE
+        )
+
+        val ndefFilter = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED).apply {
+            try {
+                addDataType("application/com.example.visionbook")
+            } catch (e: IntentFilter.MalformedMimeTypeException) {
+                e.printStackTrace()
             }
         }
 
+        val techFilter = IntentFilter(NfcAdapter.ACTION_TECH_DISCOVERED)
+        val tagFilter = IntentFilter(NfcAdapter.ACTION_TAG_DISCOVERED)
+
+        val filters = arrayOf(ndefFilter, techFilter, tagFilter)
+
+        Log.d("NFCScreen", "Foreground dispatch настроен")
+        nfcAdapter?.enableForegroundDispatch(
+            activity,
+            pendingIntent,
+            filters,
+            arrayOf(arrayOf(Ndef::class.java.name))
+        )
+
+        onDispose {
+            Log.d("NFCScreen", "Foreground dispatch отключен")
+            nfcAdapter?.disableForegroundDispatch(activity)
+        }
+    }
+
+    // Обработка новых Intent через LifecycleObserver
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val currentIntent = (context as? Activity)?.intent
+                if (currentIntent != null && isNfcIntent(currentIntent)) {
+                    Log.d("NFCScreen", "Обнаружен NFC Intent: ${currentIntent.action}")
+                    nfcMessage = writeTextToTag(currentIntent, "ИВ РАН")
+                }
+            }
+        }
         lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+
+        onDispose {
+            Log.d("NFCScreen", "LifecycleObserver удален")
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Column(
@@ -65,14 +109,14 @@ fun NFCScreen(navController: NavController) {
         }
 
         Text(
-            text = "Сканирование NFC-метки",
+            text = "Запись текста на NFC-метку",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 20.dp),
             textAlign = TextAlign.Center
         )
 
         Image(
-            painter = painterResource(id = R.drawable.nfc_scan), // Добавьте картинку NFC-сканирования
+            painter = painterResource(id = R.drawable.nfc_scan),
             contentDescription = "NFC Scan",
             modifier = Modifier
                 .size(200.dp)
@@ -80,7 +124,7 @@ fun NFCScreen(navController: NavController) {
         )
 
         Text(
-            text = "Поднесите телефон к NFC-метке для сканирования",
+            text = "Поднесите телефон к NFC-метке для записи",
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 20.dp)
@@ -103,24 +147,67 @@ fun NFCScreen(navController: NavController) {
     }
 }
 
-/**
- * Функция для чтения данных с NFC-метки
- */
-private fun readNfcTag(tag: Tag): String {
+// Проверка, является ли Intent NFC-событием
+private fun isNfcIntent(intent: Intent): Boolean {
+    return when (intent.action) {
+        NfcAdapter.ACTION_NDEF_DISCOVERED,
+        NfcAdapter.ACTION_TECH_DISCOVERED,
+        NfcAdapter.ACTION_TAG_DISCOVERED -> {
+            Log.d("NFCScreen", "NFC Intent обнаружен: ${intent.action}")
+            true
+        }
+        else -> {
+            Log.d("NFCScreen", "Неизвестный Intent: ${intent.action}")
+            false
+        }
+    }
+}
+
+// Запись текста на NFC-метку
+private fun writeTextToTag(intent: Intent, text: String): String {
+    val tag: Tag? = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG)
+    if (tag == null) {
+        Log.e("NFCScreen", "Ошибка: метка не найдена")
+        return "Ошибка: метка не найдена"
+    }
+
     val ndef = Ndef.get(tag)
+    if (ndef == null) {
+        Log.e("NFCScreen", "Метка не поддерживает NDEF")
+        return "Метка не поддерживает NDEF"
+    }
+
     return try {
-        ndef?.connect()
-        val ndefMessage = ndef?.ndefMessage
-        val record = ndefMessage?.records?.get(0)
-        val payload = record?.payload
-        payload?.let {
-            val textEncoding = if ((it[0].toInt() and 128) == 0) "UTF-8" else "UTF-16"
-            val languageCodeLength = it[0].toInt() and 51
-            String(it, languageCodeLength + 1, it.size - languageCodeLength - 1, Charset.forName(textEncoding))
-        } ?: "Пустая метка"
+        ndef.connect()
+        Log.d("NFCScreen", "Соединение с меткой установлено")
+
+        if (!ndef.isWritable) {
+            Log.e("NFCScreen", "Метка защищена от записи")
+            return "Метка защищена от записи"
+        }
+
+        // Создаем NdefRecord с текстом
+        val textBytes = text.toByteArray(StandardCharsets.UTF_8)
+        val language = "en" // Язык текста
+        val languageBytes = language.toByteArray(StandardCharsets.US_ASCII)
+        val statusByte = (languageBytes.size and 0x1F).toByte() // Первый байт содержит длину языка
+        val payload = ByteArray(1 + languageBytes.size + textBytes.size)
+        payload[0] = statusByte
+        System.arraycopy(languageBytes, 0, payload, 1, languageBytes.size)
+        System.arraycopy(textBytes, 0, payload, 1 + languageBytes.size, textBytes.size)
+
+        val record = NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, null, payload)
+        val message = NdefMessage(arrayOf(record))
+
+        // Записываем данные на метку
+        ndef.writeNdefMessage(message)
+        Log.d("NFCScreen", "Текст успешно записан: $text")
+        "Текст успешно записан: $text"
     } catch (e: Exception) {
-        "Ошибка чтения NFC"
+        Log.e("NFCScreen", "Ошибка записи: ${e.localizedMessage}", e)
+        "Ошибка записи: ${e.localizedMessage}"
     } finally {
-        ndef?.close()
+        ndef.close()
+        Log.d("NFCScreen", "Соединение с меткой закрыто")
     }
 }

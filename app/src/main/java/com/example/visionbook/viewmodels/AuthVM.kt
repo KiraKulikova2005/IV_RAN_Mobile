@@ -12,8 +12,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AuthVM : ViewModel() {
-
-
+    private val _fioState = MutableLiveData<String>()
+    val fioState: LiveData<String> = _fioState
+    private val _depState = MutableLiveData<String>()
+    val depState: LiveData<String> = _depState
     private val _emailState = MutableLiveData<String>()
     val emailState: LiveData<String> = _emailState
     private val _passwordState = MutableLiveData<String>()
@@ -36,12 +38,14 @@ class AuthVM : ViewModel() {
         _tokenState.value = token
     }
 
-    suspend fun registration(email: String, password: String, authApi: AuthApi) {
+    suspend fun registration(fio: String, dep: String, email: String, password: String, authApi: AuthApi) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 withContext(Dispatchers.Main) {
                     authApi.userRegistration(
                         RegistrationModel(
+                            fio,
+                            dep,
                             email,
                             password
                         )
@@ -54,13 +58,15 @@ class AuthVM : ViewModel() {
         }
     }
 
-    suspend fun authorization(email: String, password: String, authApi: AuthApi) {
+    suspend fun authorization(fio: String, dep: String, email: String, password: String, authApi: AuthApi) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
 
                 withContext(Dispatchers.Main) {
                     val userToken = authApi.userLogin(
                         RegistrationModel(
+                            fio,
+                            dep,
                             email,
                             password
                         )

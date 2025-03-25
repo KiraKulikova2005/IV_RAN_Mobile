@@ -101,19 +101,29 @@ fun LoginScreen(
         )
         Button(
             onClick = {
-                if (emailState.value != "" && passwordState.value != "") {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        authViewModel.authorization(emailState.value, passwordState.value, authApi)
-                    }
-                    navController.navigate(GraphRoute.MAIN) {
-                        navController.popBackStack()
-                    }
-                } else {
-                    Toast.makeText(
-                        context,
-                        checkEmailPass,
-                        Toast.LENGTH_SHORT
-                    ).show()
+                // Закомментирована проверка введенных данных
+                // if (emailState.value != "" && passwordState.value != "") {
+                //    CoroutineScope(Dispatchers.IO).launch {
+                //        authViewModel.authorization(
+                //            emailState.value, passwordState.value, authApi.toString(),
+                //            password = TODO(),
+                //            authApi = TODO()
+                //        )
+                //    }
+                //    navController.navigate(GraphRoute.MAIN) {
+                //        navController.popBackStack()
+                //    }
+                // } else {
+                //    Toast.makeText(
+                //        context,
+                //        checkEmailPass,
+                //        Toast.LENGTH_SHORT
+                //    ).show()
+                // }
+
+                // Просто переход на главный экран
+                navController.navigate(GraphRoute.MAIN) {
+                    navController.popBackStack()
                 }
             },
             shape = RoundedCornerShape(30),

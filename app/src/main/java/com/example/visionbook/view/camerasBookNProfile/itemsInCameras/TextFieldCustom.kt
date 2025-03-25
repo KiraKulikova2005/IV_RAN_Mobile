@@ -63,6 +63,73 @@ fun TextFieldCustom(
         )
     )
 }
+@Composable
+fun TextFieldFio(
+    placeholder: String,
+    fioState: MutableState<String>,
+    onValueChange: (String) -> Unit
+) {
+    TextField(
+        value = fioState.value,
+        singleLine = true,
+        onValueChange = onValueChange,
+        shape = RoundedCornerShape(percent = 30),
+        trailingIcon = {
+            IconButton(onClick = { fioState.value = "" }) {
+                Icon(
+                    painterResource(R.drawable.close),
+                    "close",
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+        },
+        placeholder = {
+            AutoresizedText(
+                placeholder,
+            )
+        },
+        // убираю нижнее подчеркивание
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+        )
+    )
+}
+
+@Composable
+fun TextFieldDep(
+    placeholder: String,
+    depState: MutableState<String>,
+    onValueChange: (String) -> Unit
+) {
+    TextField(
+        value = depState.value,
+        singleLine = true,
+        onValueChange = onValueChange,
+        shape = RoundedCornerShape(percent = 30),
+        trailingIcon = {
+            IconButton(onClick = { depState.value = "" }) {
+                Icon(
+                    painterResource(R.drawable.close),
+                    "close",
+                    modifier = Modifier.size(12.dp)
+                )
+            }
+        },
+        placeholder = {
+            AutoresizedText(
+                placeholder,
+            )
+        },
+        // убираю нижнее подчеркивание
+        colors = TextFieldDefaults.colors(
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent,
+            errorIndicatorColor = Color.Transparent,
+        )
+    )
+}
 
 @Composable
 fun TextFieldEmail(
