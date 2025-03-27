@@ -13,13 +13,15 @@ class ProfileScreenVM: ViewModel() {
     // Генерация списка профилей
     private fun generateProfileList(): List<ProfileItem> {
         val profiles = mutableListOf<ProfileItem>()
-        repeat(DataProfileScreen.nicknameList.size) { index ->
+        val count = 10
+        repeat(count) { index ->
             val id = index.toString()
-            val url = DataProfileScreen.avatarList[index]
-            val followersCount = (1..100).random() // Для примера, случайное количество подписчиков
-            val followingCount = (1..100).random() // Для примера, случайное количество подписок
-            val nickname = DataProfileScreen.nicknameList[index]
-            val profile = ProfileItem(id, url, nickname, followersCount, followingCount)
+            val role = "Лаборант"
+            val booksCount = (1..100).random() // Для примера, случайное количество подписчиков
+            val nickname = "Иванов И.И."
+            val email = "example@exaple.ru"
+            val dep = "ИВ РАН"
+            val profile = ProfileItem(id, nickname, role, booksCount, email, dep)
             profiles.add(profile)
         }
         return profiles

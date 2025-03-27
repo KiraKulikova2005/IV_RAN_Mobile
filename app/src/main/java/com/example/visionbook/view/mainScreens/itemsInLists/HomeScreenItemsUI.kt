@@ -1,14 +1,15 @@
 package com.example.visionbook.view.mainScreens.itemsInLists
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.Surface
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -21,45 +22,124 @@ import com.example.visionbook.models.NoRippleInteractionSource
 import com.example.visionbook.viewmodels.AuthVM
 
 @Composable
-fun HomeScreenItems(navController: NavController, authViewModel: AuthVM) {
+fun BookCard(
+    book: Book,
+    modifier: Modifier = Modifier
+) {
+    // Получаем текущую тему
+    val colors = MaterialTheme.colors
 
+    // Определяем цвет текста и полосок в зависимости от темы
+    val textColor = if (colors.isLight) Color.Black else Color.White
+    val dividerColor = if (colors.isLight) Color.White else Color.Black
 
-    val randomIndex = (0 until DataBooksScreen.coverList.size).random()
-    Surface(
-        shape = RoundedCornerShape(10)
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .background(colors.surface),
+        horizontalAlignment = Alignment.Start
     ) {
-        Box(contentAlignment = Alignment.BottomEnd,
-            modifier = Modifier.clickable {
-                navController.navigate(NavigationItems.Post.route)
-            }
+        // Верхняя полоска
+        Divider(color = dividerColor, thickness = 1.dp)
+
+        // Содержимое карточки
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // bitmap?.let {
+            // Обложка книги
             AsyncImage(
-                DataBooksScreen.imageList[randomIndex],
-                contentDescription = "",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth().wrapContentHeight()
+                model = book.coverUrl,
+                contentDescription = "Book Cover",
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(8.dp)),
+                contentScale = ContentScale.Crop
             )
-            //   }
-            var checked by remember {
-                mutableStateOf(false)
-            }
-            IconToggleButton(
-                modifier = Modifier.padding(bottom = 10.dp, end = 10.dp)
-                    .then(
-                        Modifier.size(21.dp)
-                    ),
-                checked = checked,
-                onCheckedChange = { _checked ->
-                    checked = _checked
-                },
-                interactionSource = NoRippleInteractionSource()
+
+            Spacer(modifier = Modifier.width(16.dp)) // Отступ между обложкой и текстом
+
+            // Текстовая часть
+            Column(
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.like),
-                    "Like",
+                // Тип книги
+                Text(
+                    text = "Книга",
+                    style = MaterialTheme.typography.titleMedium.copy(color = textColor)
+                )
+
+                // Название книги
+                Text(
+                    text = book.title,
+                    style = MaterialTheme.typography.bodyLarge.copy(color = textColor)
+                )
+
+                // Автор
+                Text(
+                    text = book.author,
+                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
+                )
+
+                // Год издания
+                Text(
+                    text = "${book.year} г.",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = textColor)
                 )
             }
+        }
+
+        // Нижняя полоска
+        Divider(color = dividerColor, thickness = 1.dp)
+    }
+}
+
+// Модель книги
+data class Book(
+    val coverUrl: String,
+    val title: String,
+    val author: String,
+    val year: Int
+)
+
+// Пример использования
+@Composable
+fun HomeScreenItems(navController: NavController, authViewModel: AuthVM) {
+    val books = listOf(
+        Book(
+            coverUrl = "https://example.com/book1.jpg",
+            title = "Боги и демоны Древнего Египта",
+            author = "Ксения Карлова",
+            year = 2012
+        ),
+        Book(
+            coverUrl = "https://example.com/book2.jpg",
+            title = "Бродячие сюжеты в китайской средневековой прозе",
+            author = "А.Б. Старостина",
+            year = 2022
+        ),
+        Book(
+            coverUrl = "https://example.com/book3.jpg",
+            title = "О:та Го:йти. «Синтё:-ко: ки». «Записи о князе Нобунага»",
+            author = "Е.У. Ванина",
+            year = 2010
+        )
+    )
+
+    Column(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        books.forEach { book ->
+            BookCard(
+                book = book,
+                modifier = Modifier
+                    .padding(vertical = 8.dp)
+                    .clickable {
+                        navController.navigate("${NavigationItems.Post.route}/${book.title}")
+                    }
+            )
         }
     }
 }

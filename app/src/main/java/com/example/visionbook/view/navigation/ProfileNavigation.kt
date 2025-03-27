@@ -5,7 +5,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.visionbook.view.profileScreens.ProfileScreen
-import com.example.visionbook.view.profileScreens.SubsScreen
 
 fun NavGraphBuilder.profileNavigation(navController: NavHostController){
     navigation(
@@ -15,13 +14,9 @@ fun NavGraphBuilder.profileNavigation(navController: NavHostController){
         composable(ProfileScreen.Profile.route){
             ProfileScreen(navController)
         }
-        composable(ProfileScreen.Subs.route){
-            SubsScreen()
-        }
     }
 }
 
 sealed class ProfileScreen(val route: String) {
     object Profile : ProfileScreen("PROFILE")
-    object Subs : ProfileScreen("SUBS")
 }

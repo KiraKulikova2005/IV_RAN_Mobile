@@ -47,9 +47,11 @@
     <string name="forgot_button">Восстановить</string>
 
 
-    <string name="user_subs_bt">Подписаться</string>
-    <string name="user_subscribe">Подписки</string>
-    <string name="user_subscribers">Подписчики</string>
+    <string name="user_role">Лаборант</string>
+    <string name="user_id">id: 73892637</string>
+    <string name="user_proc">Обработано</string>
+    <string name="user_email">email: email@email.ru</string>
+    <string name="user_dep">Подразделение: ИВ РАН</string>
 
 
     <string name="preprofilecamera_text">Добавление аватара в профиль</string>
