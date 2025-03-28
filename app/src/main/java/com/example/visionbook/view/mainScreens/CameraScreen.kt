@@ -16,6 +16,7 @@ import com.example.visionbook.models.FileHelper
 import com.example.visionbook.models.checkCameraPermission
 import com.example.visionbook.view.camerasBookNProfile.CameraBook
 import com.example.visionbook.view.camerasBookNProfile.CameraProfile
+import com.example.visionbook.view.camerasBookNProfile.CameraQr
 
 @Composable
 fun Camera(context: Context, navController: NavController) {
@@ -56,8 +57,18 @@ fun Camera(context: Context, navController: NavController) {
                 lifecycleOwner = lifecycleOwner,
                 isCameraPermissionGranted = isCameraPermissionGranted
             )
-        } else {
+        }
+        if (previousRoute == "camerainmain") {
             CameraBook(
+                fileHelper.getDirectory(),
+                navController = navController,
+                context = context,
+                lifecycleOwner = lifecycleOwner,
+                isCameraPermissionGranted = isCameraPermissionGranted
+            )
+        }
+        else {
+            CameraQr(
                 fileHelper.getDirectory(),
                 navController = navController,
                 context = context,

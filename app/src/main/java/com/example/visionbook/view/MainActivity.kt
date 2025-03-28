@@ -1,6 +1,7 @@
 package com.example.visionbook.view
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -112,4 +113,5 @@ fun MainScreen(onThemeUpdated: () -> Unit, authViewModel: AuthVM) {
         },
         bottomBar = { AnimatedBottomNavigationBar(navController, bottomBarState) },
     )
+
 }

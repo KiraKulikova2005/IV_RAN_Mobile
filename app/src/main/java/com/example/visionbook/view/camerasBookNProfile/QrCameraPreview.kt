@@ -5,46 +5,44 @@ import android.net.Uri
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import com.example.visionbook.R
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import com.example.visionbook.models.FaceAnalyser
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.ButtonCaptureImage
-import com.example.visionbook.models.FaceAnalyser
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.FlashToggleButton
 import com.example.visionbook.view.camerasBookNProfile.secondCameraScreens.CanceledPermissonScreen
 import java.io.File
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
 
-
-
 @Composable
-fun CameraBook(
+fun CameraQr(
     directory: File,
     navController: NavController,
     context: Context,
     lifecycleOwner: LifecycleOwner,
-    isCameraPermissionGranted: MutableState<Boolean>) {
+    isCameraPermissionGranted: MutableState<Boolean>
+) {
 
     val camera: Camera? = null
     val executor = ContextCompat.getMainExecutor(context)
     if (isCameraPermissionGranted.value) {
-        BookCameraPreview(
+        QrCameraPreview(
             navController = navController,
             modifier = Modifier.fillMaxSize(),
             context = context,
@@ -61,7 +59,7 @@ fun CameraBook(
 }
 
 @Composable
-fun BookCameraPreview(
+fun QrCameraPreview(
     navController: NavController,
     modifier: Modifier = Modifier,
     context: Context,
@@ -70,7 +68,7 @@ fun BookCameraPreview(
     onMediaCaptured: (Uri?) -> Unit,
     camera: Camera?,
     executor: Executor,
-    ) {
+) {
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var preview by remember { mutableStateOf<Preview?>(null) }
     var cameraControl: CameraControl? by remember { mutableStateOf(null) }

@@ -29,6 +29,3 @@ fun HomeScreen(navController: NavController, authViewModel: AuthVM) {
         modifier = Modifier.fillMaxSize().padding(start = 12.dp, end = 12.dp)
     )
 }
-
-
-

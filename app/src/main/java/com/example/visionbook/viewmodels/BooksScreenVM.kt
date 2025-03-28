@@ -26,8 +26,8 @@ class BooksScreenVM: ViewModel() {
     val authorState: LiveData<String> = _authorState
     private val _genreState = MutableLiveData<String>()
     val genreState: LiveData<String> = _genreState
-   /* private val _query = MutableLiveData("")
-    val query: LiveData<String> = _query*/
+    /* private val _query = MutableLiveData("")
+     val query: LiveData<String> = _query*/
 
     private val _booksList = MutableLiveData<List<BooksModel>>()
     val booksList: LiveData<List<BooksModel>> = _booksList
@@ -44,7 +44,7 @@ class BooksScreenVM: ViewModel() {
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-               val listOfBooks = withContext(Dispatchers.Main) {
+                val listOfBooks = withContext(Dispatchers.Main) {
                     bookApi.getBooks(
                         token,
                         amount
@@ -58,17 +58,17 @@ class BooksScreenVM: ViewModel() {
     }
 
     // ДЛЯ ПОИСКА
- /*   suspend fun getBookByName(bookApi: BooksApi, token: String, name: String) {
-        viewModelScope.launch {
-            try {
-               // val bookList = bookApi.getBookByName(token, name)
-              //  _productList.postValue(productList.products)
-            } catch (e: Exception) {
-                // Обработка ошибок
-                e.printStackTrace()
-            }
-        }
-    }*/
+    /*   suspend fun getBookByName(bookApi: BooksApi, token: String, name: String) {
+           viewModelScope.launch {
+               try {
+                  // val bookList = bookApi.getBookByName(token, name)
+                 //  _productList.postValue(productList.products)
+               } catch (e: Exception) {
+                   // Обработка ошибок
+                   e.printStackTrace()
+               }
+           }
+       }*/
     suspend fun addBookToSharedList(
         token: String,
         bookApi: BooksApi,
