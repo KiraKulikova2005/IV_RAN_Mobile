@@ -2,32 +2,33 @@ package com.example.visionbook.view.camerasBookNProfile
 
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
-import com.example.visionbook.R
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
-import com.example.visionbook.models.FaceAnalyser
+import com.example.visionbook.R
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.ButtonCaptureImage
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.FlashToggleButton
-import com.example.visionbook.view.camerasBookNProfile.secondCameraScreens.CanceledPermissonScreen
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.common.InputImage
 import java.io.File
-import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
 
 @Composable
@@ -38,7 +39,6 @@ fun CameraQr(
     lifecycleOwner: LifecycleOwner,
     isCameraPermissionGranted: MutableState<Boolean>
 ) {
-
     val camera: Camera? = null
     val executor = ContextCompat.getMainExecutor(context)
     if (isCameraPermissionGranted.value) {
@@ -54,7 +54,6 @@ fun CameraQr(
         )
     } else {
         BackButton(navController = navController)
-        CanceledPermissonScreen()
     }
 }
 
@@ -74,16 +73,11 @@ fun QrCameraPreview(
     var cameraControl: CameraControl? by remember { mutableStateOf(null) }
     var isFlashEnabled by remember { mutableStateOf(false) }
     var hasFlash by remember { mutableStateOf(false) }
+    var showSuccessDialog by remember { mutableStateOf(false) }
 
-    // Camera Provider
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-
     val cameraProvider by produceState<ProcessCameraProvider?>(initialValue = null) {
-        value = try {
-            cameraProviderFuture.get()
-        } catch (e: ExecutionException) {
-            null
-        }
+        value = cameraProviderFuture.get()
     }
     val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
@@ -97,7 +91,9 @@ fun QrCameraPreview(
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                         .build()
                         .apply {
-                            setAnalyzer(executor, FaceAnalyser())
+                            setAnalyzer(executor, BarcodeAnalyzer { barcodeValue ->
+                                showSuccessDialog = true
+                            })
                         }
 
                     imageCapture = ImageCapture.Builder()
@@ -130,7 +126,33 @@ fun QrCameraPreview(
             }
         )
 
-        // В верхней панели
+        // Заголовок "Сканирование QR-кода"
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 90.dp)
+                .padding(horizontal = 30.dp)
+                .background(Color.White, shape = RoundedCornerShape(20.dp)),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Сканирование QR-кода",
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.padding(10.dp),
+                color = Color.Black
+            )
+        }
+
+        // Рамка области сканирования
+        Icon(
+            painter = painterResource(id = R.drawable.frame),
+            contentDescription = "Рамка сканирования",
+            modifier = Modifier
+                .size(250.dp)
+                .align(Alignment.Center)
+        )
+
+        // Верхняя панель с кнопкой вспышки
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -151,8 +173,8 @@ fun QrCameraPreview(
             }
         }
 
-        // Нижняя панель с кнопкой съемки
-        Row (
+        // Кнопка "Назад"
+        Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -160,21 +182,42 @@ fun QrCameraPreview(
         ) {
             BackButton(navController = navController)
         }
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(25.dp)
-                .align(Alignment.BottomCenter)
-        ) {
-            ButtonCaptureImage(
-                context,
-                outputDirectory,
-                onMediaCaptured,
-                imageCapture,
-                executor
+
+        // Диалог успешного сканирования
+        if (showSuccessDialog) {
+            AlertDialog(
+                onDismissRequest = { showSuccessDialog = false },
+                confirmButton = {
+                    Button(onClick = { showSuccessDialog = false }) {
+                        Text("OK")
+                    }
+                },
+                title = { Text("Успех!") },
+                text = { Text("Сканирование прошло успешно!") }
             )
         }
+    }
+}
+
+// Анализатор QR-кодов
+class BarcodeAnalyzer(private val onBarcodeDetected: (String) -> Unit) : ImageAnalysis.Analyzer {
+    private val scanner = BarcodeScanning.getClient()
+
+    override fun analyze(imageProxy: ImageProxy) {
+        val mediaImage = imageProxy.image ?: return
+        val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+
+        scanner.process(image)
+            .addOnSuccessListener { barcodes ->
+                barcodes.firstOrNull()?.rawValue?.let {
+                    onBarcodeDetected(it)
+                }
+            }
+            .addOnFailureListener {
+                // Ошибка сканирования
+            }
+            .addOnCompleteListener {
+                imageProxy.close()
+            }
     }
 }

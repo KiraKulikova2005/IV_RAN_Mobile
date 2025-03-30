@@ -38,10 +38,9 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileScreenVM = vie
             ) {
                 BackButton(navController = navController)
             }
-            Image(
-                painter = painterResource(R.drawable.logo),
+            Icon(
+                painter = painterResource(R.drawable.profile),
                 contentDescription = "Avatar",
-                contentScale = ContentScale.Crop,
                 modifier = Modifier.size(180.dp).clip(CircleShape)
             )
             Spacer(modifier = Modifier.height(20.dp))

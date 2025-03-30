@@ -54,10 +54,9 @@ fun SettingsProfileScreen(
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(
-                    painter = painterResource(R.drawable.logo),
+                Icon(
+                    painter = painterResource(R.drawable.profile),
                     contentDescription = "Avatar",
-                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .padding(top = 10.dp, bottom = 10.dp, start = 15.dp)
                         .size(65.dp)
@@ -171,4 +170,3 @@ fun MenuButton(
         }
     }
 }
-

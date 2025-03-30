@@ -27,6 +27,22 @@ class AuthVM : ViewModel() {
     private val _tokenState = MutableLiveData<String>()
     val tokenState: LiveData<String> = _tokenState
 
+    private val _isAuthenticated = MutableLiveData<Boolean>(false)
+    val isAuthenticated: LiveData<Boolean> = _isAuthenticated
+
+    fun loginSuccess(token: String) {
+        setToken(token)
+        _isAuthenticated.value = true
+    }
+
+    fun logout() {
+        // Очищаем все данные аутентификации
+        _tokenState.value = ""
+        _isAuthenticated.value = false
+        _emailState.value = ""
+        _passwordState.value = ""
+    }
+
     fun checkPasswordMatch(password: String, secondPassword: String?): Boolean {
         return if (secondPassword != null) {
             password == secondPassword

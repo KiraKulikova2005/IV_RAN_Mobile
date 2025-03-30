@@ -42,5 +42,4 @@ sealed class SettingsScreen(val route: String) {
     object Notification : SettingsScreen("NOTIFICATION")
     object Security : SettingsScreen("SECURITY")
     object ProfileSettings : SettingsScreen("PROFILESETTINGS")
-    object Exit : SettingsScreen("EXIT")
 }

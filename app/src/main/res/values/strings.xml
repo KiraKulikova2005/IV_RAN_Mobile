@@ -1,4 +1,9 @@
 <resources>
+    <string name="logout_confirmation_title">Подтверждение выхода</string>
+    <string name="logout_confirmation_message">Вы уверены, что хотите выйти из профиля?</string>
+    <string name="logout">Выйти</string>
+    <string name="cancel">Отмена</string>
+
     <string name="app_name" translatable="false">ИВ РАН</string>
     <string name="search">Поиск…</string>
     <string name="topbar_agitation">Поиск</string>

@@ -56,6 +56,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("com.google.android.engage:engage-core:1.3.0")
+    implementation ("com.google.mlkit:barcode-scanning:16.0.0")
 
     // Camera
     implementation("androidx.camera:camera-core:1.3.1")

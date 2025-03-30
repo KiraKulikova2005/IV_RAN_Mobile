@@ -8,15 +8,26 @@ import android.nfc.Tag
 import android.nfc.tech.Ndef
 import android.os.Bundle
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.visionbook.R
 import com.example.visionbook.models.NavigationItems
+import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import java.nio.charset.StandardCharsets
 
 @Composable
@@ -24,10 +35,19 @@ fun NFCScreen(navController: NavController) {
     val context = LocalContext.current
     val activity = context as Activity
     val nfcAdapter = NfcAdapter.getDefaultAdapter(context)
-    var nfcMessage by remember { mutableStateOf("Поднесите NFC-метку...") }
+    var nfcMessage by remember { mutableStateOf("Поднесите телефон к NFC-метке для сканирования") }
     var showDialog by remember { mutableStateOf(false) }
+    var scanCompleted by remember { mutableStateOf(false) }
 
-    // Callback для обнаружения меток
+    // Новое состояние для заголовка
+    var headerText by remember {
+        mutableStateOf("Сканирование NFC-метки")
+    }
+
+    Row(
+        modifier = Modifier.padding(bottom = 80.dp)
+    ) { BackButton(navController) }
+
     val readerCallback = remember {
         object : NfcAdapter.ReaderCallback {
             override fun onTagDiscovered(tag: Tag) {
@@ -35,21 +55,16 @@ fun NFCScreen(navController: NavController) {
                     val ndef = Ndef.get(tag)
                     if (ndef != null) {
                         ndef.connect()
-
-                        // Создаем NDEF запись с нашим текстом
-                        val textRecord = createTextRecord("ИВ РАН") //потом тут будет индекс
+                        val textRecord = createTextRecord("ИВ РАН")
                         val message = NdefMessage(arrayOf(textRecord))
-
                         ndef.writeNdefMessage(message)
                         activity.runOnUiThread {
-                            nfcMessage = "Данные успешно записаны!"
+                            nfcMessage = "Сканирование успешно завершено!"
+                            headerText = "Сканирование завершено" // Меняем заголовок
+                            scanCompleted = true
                             showDialog = true
                         }
                         ndef.close()
-                    } else {
-                        activity.runOnUiThread {
-                            nfcMessage = "Метка не поддерживает NDEF"
-                        }
                     }
                 } catch (e: Exception) {
                     activity.runOnUiThread {
@@ -97,23 +112,57 @@ fun NFCScreen(navController: NavController) {
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            title = { Text("Создать новую сессию?") },
-            text = { Text("Вы хотите создать новую сессию и перейти к камере?") },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        showDialog = false
-                        navController.navigate(NavigationItems.Camera.route)
-                    }
+            containerColor = Color.White, // Белый фон диалога
+            title = {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.TopEnd
                 ) {
-                    Text("Да")
+                    IconButton(
+                        onClick = { showDialog = false }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Закрыть",
+                            tint = Color.Black // Чёрный цвет иконки
+                        )
+                    }
                 }
             },
-            dismissButton = {
-                Button(
-                    onClick = { showDialog = false }
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("Нет")
+                    Text(
+                        text = "Создать новую сессию и перейти к сканированию QR-кода?",
+                        textAlign = TextAlign.Center,
+                        color = Color.Black, // Чёрный текст
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontStyle = FontStyle.Normal // Убираем курсив
+                        )
+                    )
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = {
+                            showDialog = false
+                            navController.navigate(NavigationItems.Camera.route)
+                        }
+                    ) {
+                        Text(
+                            "Да",
+                            color = Color.White, // Чёрный текст
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontStyle = FontStyle.Normal // Убираем курсив
+                            )
+                        )
+                    }
                 }
             }
         )
@@ -124,18 +173,40 @@ fun NFCScreen(navController: NavController) {
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Большой жирный заголовок
+        Text(
+            text = headerText,
+            style = MaterialTheme.typography.displaySmall.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 30.sp
+            ),
+            modifier = Modifier.padding(top = 100.dp, bottom = 24.dp),
+            textAlign = TextAlign.Center
+        )
+
+        // Картинка NFC
+        Image(
+            painter = painterResource(
+                id = if (scanCompleted) R.drawable.nfc_done else R.drawable.nfc_scan
+            ),
+            contentDescription = "NFC Status",
+            modifier = Modifier
+                .size(300.dp)
+                .padding(bottom = 24.dp)
+        )
+
+        // Описательный текст
         Text(
             text = nfcMessage,
             style = MaterialTheme.typography.headlineSmall,
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 24.dp),
+            textAlign = TextAlign.Center
         )
-
-        Button(onClick = { navController.popBackStack() }) {
-            Text("Назад")
-        }
     }
 }
 

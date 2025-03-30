@@ -11,6 +11,7 @@ import com.example.visionbook.view.authScreens.LoginScreen
 import com.example.visionbook.view.authScreens.NFCScreen
 import com.example.visionbook.view.authScreens.RegistrationScreen
 import com.example.visionbook.view.mainScreens.Camera
+import com.example.visionbook.view.mainScreens.HomeScreen
 import com.example.visionbook.viewmodels.AuthVM
 
 fun NavGraphBuilder.authNavigation(navController: NavHostController, authViewModel: AuthVM) {

@@ -7,6 +7,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -32,6 +33,13 @@ fun AnimatedTopNavigationBar(
     scrollBehavior: TopAppBarScrollBehavior,
     viewModel: SearchAndFiltersVM
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+
+    // Сбрасываем состояние поиска при изменении маршрута
+    LaunchedEffect(navBackStackEntry) {
+        viewModel.resetSearchState()
+    }
+
     AnimatedVisibility(
         visible = topAppBarState.value,
         enter = slideInVertically(initialOffsetY = { -it }),
