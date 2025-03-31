@@ -6,6 +6,7 @@ sealed class NavigationItems(var route: String, var icon: Int, var title: String
     object Home : NavigationItems("home", R.drawable.home, "Home")
     object Books : NavigationItems("books", R.drawable.book, "Books")
     object NFC:NavigationItems("nfc", R.drawable.theme, "NFC")
+    object NFCRead:NavigationItems("nfcread", R.drawable.theme, "NFCRead")
     object Camera : NavigationItems("camera", R.drawable.camera, "Camera")
     object QrCamera: NavigationItems("qrcamera", R.drawable.camera, "QrCamera")
     object Bookmarks : NavigationItems("bookmarks", R.drawable.bookmark, "Bookmarks")

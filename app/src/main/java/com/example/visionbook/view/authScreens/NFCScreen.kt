@@ -28,7 +28,10 @@ import androidx.navigation.NavController
 import com.example.visionbook.R
 import com.example.visionbook.models.NavigationItems
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
+import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
+import java.util.*
+import kotlin.experimental.and
 
 @Composable
 fun NFCScreen(navController: NavController) {
@@ -38,11 +41,8 @@ fun NFCScreen(navController: NavController) {
     var nfcMessage by remember { mutableStateOf("Поднесите телефон к NFC-метке для сканирования") }
     var showDialog by remember { mutableStateOf(false) }
     var scanCompleted by remember { mutableStateOf(false) }
-
-    // Новое состояние для заголовка
-    var headerText by remember {
-        mutableStateOf("Сканирование NFC-метки")
-    }
+    var headerText by remember { mutableStateOf("Сканирование NFC-метки") }
+    var tagContent by remember { mutableStateOf("") }
 
     Row(
         modifier = Modifier.padding(bottom = 80.dp)
@@ -55,28 +55,67 @@ fun NFCScreen(navController: NavController) {
                     val ndef = Ndef.get(tag)
                     if (ndef != null) {
                         ndef.connect()
-                        val textRecord = createTextRecord("ИВ РАН")
-                        val message = NdefMessage(arrayOf(textRecord))
-                        ndef.writeNdefMessage(message)
-                        activity.runOnUiThread {
-                            nfcMessage = "Сканирование успешно завершено!"
-                            headerText = "Сканирование завершено" // Меняем заголовок
-                            scanCompleted = true
-                            showDialog = true
+                        val ndefMessage = ndef.ndefMessage
+
+                        if (ndefMessage != null) {
+                            val records = ndefMessage.records
+                            val contentBuilder = StringBuilder()
+
+                            for (record in records) {
+                                if (record.tnf == NdefRecord.TNF_WELL_KNOWN &&
+                                    Arrays.equals(record.type, NdefRecord.RTD_TEXT)) {
+                                    // Декодируем текст с учетом языка
+                                    val payload = record.payload
+                                    val textEncoding = if ((payload[0] and 0x80.toByte()) == 0.toByte()) "UTF-8" else "UTF-16"
+                                    val languageCodeLength = payload[0] and 0x3F
+                                    val text = String(
+                                        payload,
+                                        languageCodeLength + 1,
+                                        payload.size - languageCodeLength - 1,
+                                        Charset.forName(textEncoding)
+                                    )
+                                    contentBuilder.append(text)
+                                }
+                                // Обработка других типов записей (URI и т.д.)
+                                else if (record.toUri() != null) {
+                                    contentBuilder.append(record.toUri().toString())
+                                }
+                            }
+
+                            val content = contentBuilder.toString().trim()
+                            activity.runOnUiThread {
+                                tagContent = content
+                                nfcMessage = if (content.isNotEmpty()) {
+                                    "id: $content"
+                                } else {
+                                    "Метка пуста или содержит неподдерживаемые данные"
+                                }
+                                headerText = "Сканирование завершено"
+                                scanCompleted = true
+                                showDialog = true
+                            }
+                        } else {
+                            activity.runOnUiThread {
+                                nfcMessage = "Метка не содержит данных"
+                                headerText = "Сканирование завершено"
+                                scanCompleted = true
+                                showDialog = true
+                            }
                         }
                         ndef.close()
                     }
                 } catch (e: Exception) {
                     activity.runOnUiThread {
                         nfcMessage = "Ошибка: ${e.localizedMessage}"
+                        Log.e("NFC", "Ошибка чтения", e)
                     }
-                    Log.e("NFC", "Ошибка записи", e)
                 }
             }
         }
     }
 
-    // Включаем режим чтения/записи
+
+    // Включаем режим чтения
     DisposableEffect(Unit) {
         if (nfcAdapter == null) {
             nfcMessage = "NFC не поддерживается"
@@ -98,8 +137,7 @@ fun NFCScreen(navController: NavController) {
             NfcAdapter.FLAG_READER_NFC_A or
                     NfcAdapter.FLAG_READER_NFC_B or
                     NfcAdapter.FLAG_READER_NFC_F or
-                    NfcAdapter.FLAG_READER_NFC_V or
-                    NfcAdapter.FLAG_READER_NFC_BARCODE,
+                    NfcAdapter.FLAG_READER_NFC_V,
             options
         )
 
@@ -108,23 +146,21 @@ fun NFCScreen(navController: NavController) {
         }
     }
 
-    // Диалоговое окно для подтверждения создания новой сессии
+    // Диалоговое окно после успешного считывания
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
-            containerColor = Color.White, // Белый фон диалога
+            containerColor = Color.White,
             title = {
                 Box(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.TopEnd
                 ) {
-                    IconButton(
-                        onClick = { showDialog = false }
-                    ) {
+                    IconButton(onClick = { showDialog = false }) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Закрыть",
-                            tint = Color.Black // Чёрный цвет иконки
+                            tint = Color.Black
                         )
                     }
                 }
@@ -135,12 +171,14 @@ fun NFCScreen(navController: NavController) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Создать новую сессию и перейти к сканированию QR-кода?",
+                        text = if (tagContent.isNotEmpty()) {
+                            "id:\n$tagContent\n\nПерейти к сканированию QR-кода?"
+                        } else {
+                            "Метка не содержит данных\n\nПерейти к сканированию QR-кода?"
+                        },
                         textAlign = TextAlign.Center,
-                        color = Color.Black, // Чёрный текст
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontStyle = FontStyle.Normal // Убираем курсив
-                        )
+                        color = Color.Black,
+                        style = MaterialTheme.typography.bodyLarge
                     )
                 }
             },
@@ -155,13 +193,7 @@ fun NFCScreen(navController: NavController) {
                             navController.navigate(NavigationItems.Camera.route)
                         }
                     ) {
-                        Text(
-                            "Да",
-                            color = Color.White, // Чёрный текст
-                            style = MaterialTheme.typography.bodyLarge.copy(
-                                fontStyle = FontStyle.Normal // Убираем курсив
-                            )
-                        )
+                        Text("Да", color = Color.White)
                     }
                 }
             }
@@ -176,7 +208,6 @@ fun NFCScreen(navController: NavController) {
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Большой жирный заголовок
         Text(
             text = headerText,
             style = MaterialTheme.typography.displaySmall.copy(
@@ -187,7 +218,6 @@ fun NFCScreen(navController: NavController) {
             textAlign = TextAlign.Center
         )
 
-        // Картинка NFC
         Image(
             painter = painterResource(
                 id = if (scanCompleted) R.drawable.nfc_done else R.drawable.nfc_scan
@@ -198,7 +228,6 @@ fun NFCScreen(navController: NavController) {
                 .padding(bottom = 24.dp)
         )
 
-        // Описательный текст
         Text(
             text = nfcMessage,
             style = MaterialTheme.typography.headlineSmall,
@@ -208,21 +237,4 @@ fun NFCScreen(navController: NavController) {
             textAlign = TextAlign.Center
         )
     }
-}
-
-private fun createTextRecord(text: String): NdefRecord {
-    val lang = "en".toByteArray(StandardCharsets.US_ASCII)
-    val textBytes = text.toByteArray(StandardCharsets.UTF_8)
-    val payload = ByteArray(1 + lang.size + textBytes.size)
-
-    payload[0] = lang.size.toByte()
-    System.arraycopy(lang, 0, payload, 1, lang.size)
-    System.arraycopy(textBytes, 0, payload, 1 + lang.size, textBytes.size)
-
-    return NdefRecord(
-        NdefRecord.TNF_WELL_KNOWN,
-        NdefRecord.RTD_TEXT,
-        ByteArray(0),
-        payload
-    )
 }

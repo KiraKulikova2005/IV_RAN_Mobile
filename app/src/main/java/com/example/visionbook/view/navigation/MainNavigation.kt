@@ -7,6 +7,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.visionbook.models.NavigationItems
 import com.example.visionbook.view.addScreens.Post
+import com.example.visionbook.view.authScreens.NFCScreen
 import com.example.visionbook.view.camerasBookNProfile.secondCameraScreens.PickImageFromGallery
 import com.example.visionbook.view.camerasBookNProfile.secondCameraScreens.PreMainCameraScreen
 import com.example.visionbook.view.mainScreens.*
@@ -33,6 +34,10 @@ fun MainNavigation(navController: NavHostController, onThemeUpdated: () -> Unit,
         }
         composable(NavigationItems.Post.route) {
                 Post(authViewModel = authViewModel)
+        }
+
+        composable(NavigationItems.NFCRead.route) {
+            NFCReadScreen(navController)
         }
 
         profileNavigation(navController)

@@ -26,6 +26,7 @@ import com.example.visionbook.R
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.ButtonCaptureImage
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.FlashToggleButton
+import com.example.visionbook.view.navigation.GraphRoute
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
 import java.io.File
@@ -92,6 +93,7 @@ fun QrCameraPreview(
                         .build()
                         .apply {
                             setAnalyzer(executor, BarcodeAnalyzer { barcodeValue ->
+                                // Только показываем диалог, не навигируем сразу
                                 showSuccessDialog = true
                             })
                         }
@@ -186,9 +188,19 @@ fun QrCameraPreview(
         // Диалог успешного сканирования
         if (showSuccessDialog) {
             AlertDialog(
-                onDismissRequest = { showSuccessDialog = false },
+                onDismissRequest = {
+                    showSuccessDialog = false
+                },
                 confirmButton = {
-                    Button(onClick = { showSuccessDialog = false }) {
+                    Button(onClick = {
+                        showSuccessDialog = false
+                        // Переход на главную страницу при нажатии OK
+                        navController.navigate(GraphRoute.MAIN) {
+                            popUpTo(GraphRoute.MAIN) {
+                                inclusive = true
+                            }
+                        }
+                    }) {
                         Text("OK")
                     }
                 },

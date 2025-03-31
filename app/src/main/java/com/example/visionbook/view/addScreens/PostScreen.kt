@@ -10,11 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
@@ -48,7 +44,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 @Composable
 fun Post(
     playerViewModel: ExoPlayerVM = viewModel(),
-    authViewModel: AuthVM
+    authViewModel: AuthVM = viewModel()
 ){
     val userViewModel = viewModel<ProfileScreenVM>()
     val bookViewModel = viewModel<BooksScreenVM>()
@@ -57,14 +53,19 @@ fun Post(
     val context = LocalContext.current
     val postItem = postViewModel.getPostItem()
 
+    if (postItem == null) {
+        CircularProgressIndicator()
+        return
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        val (exoPlayer, bitmap) = remember { playerViewModel.initializePlayer(postItem.videoUrl, context) }
+        val (exoPlayer, bitmap) = remember(postItem.videoUrl) {
+            playerViewModel.initializePlayer(postItem.videoUrl, context)
+        }
 
         DisposableEffect(context) {
             onDispose {
                 playerViewModel.releasePlayer()
-                bitmap?.recycle()
             }
         }
 
@@ -72,12 +73,8 @@ fun Post(
             modifier = Modifier.fillMaxWidth(),
             factory = { context ->
                 PlayerView(context).apply {
-                    player = exoPlayer
+                    player = exoPlayer ?: return@apply
                     useController = true
-                    controllerShowTimeoutMs = 0
-                    hideController()
-                    useArtwork = true
-                    defaultArtwork = bitmap?.toDrawable(context.resources)
                 }
             }
         )

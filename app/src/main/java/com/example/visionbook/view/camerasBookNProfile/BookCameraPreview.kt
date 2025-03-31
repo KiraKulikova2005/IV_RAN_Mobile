@@ -2,22 +2,24 @@ package com.example.visionbook.view.camerasBookNProfile
 
 import android.content.Context
 import android.net.Uri
+import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextAlign
 import com.example.visionbook.R
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
@@ -25,6 +27,7 @@ import androidx.navigation.NavController
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.ButtonCaptureImage
 import com.example.visionbook.models.FaceAnalyser
+import com.example.visionbook.models.NavigationItems
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.FlashToggleButton
 import com.example.visionbook.view.camerasBookNProfile.secondCameraScreens.CanceledPermissonScreen
 import java.io.File
@@ -70,12 +73,13 @@ fun BookCameraPreview(
     onMediaCaptured: (Uri?) -> Unit,
     camera: Camera?,
     executor: Executor,
-    ) {
+) {
     var imageCapture: ImageCapture? by remember { mutableStateOf(null) }
     var preview by remember { mutableStateOf<Preview?>(null) }
     var cameraControl: CameraControl? by remember { mutableStateOf(null) }
     var isFlashEnabled by remember { mutableStateOf(false) }
     var hasFlash by remember { mutableStateOf(false) }
+    var showDialog by remember { mutableStateOf(false) } // Состояние для диалога
 
     // Camera Provider
     val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
@@ -132,7 +136,7 @@ fun BookCameraPreview(
             }
         )
 
-        // В верхней панели
+        // Верхняя панель
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -173,10 +177,83 @@ fun BookCameraPreview(
             ButtonCaptureImage(
                 context,
                 outputDirectory,
-                onMediaCaptured,
+                { uri ->
+                    onMediaCaptured(uri)
+                    showDialog = true // Показываем диалог после съемки
+                },
                 imageCapture,
                 executor
             )
         }
+
+        // Диалоговое окно для подтверждения записи метки
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                containerColor = Color.White,
+                title = {
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.TopEnd
+                    ) {
+                        IconButton(
+                            onClick = { showDialog = false }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Закрыть",
+                                tint = Color.Black // Чёрный цвет иконки
+                            )
+                        }
+                    }
+                },
+                text = {
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = "Записать метку?",
+                            textAlign = TextAlign.Center,
+                            color = Color.Black,
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                fontStyle = FontStyle.Normal
+                            )
+                        )
+                    }
+                },
+                confirmButton = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Button(
+                            onClick = {
+                                showDialog = false
+                                try {
+                                    navController.navigate(NavigationItems.NFCRead.route) {
+                                        launchSingleTop = true
+                                    }
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                    // Показать Toast с ошибкой
+                                    Toast.makeText(context, "Navigation error: ${e.message}", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        ) {
+                            Text(
+                                "Да",
+                                color = Color.White,
+                                style = MaterialTheme.typography.bodyLarge.copy(
+                                    fontStyle = FontStyle.Normal
+                                )
+                            )
+                        }
+                    }
+                }
+            )
+        }
     }
 }
+
+

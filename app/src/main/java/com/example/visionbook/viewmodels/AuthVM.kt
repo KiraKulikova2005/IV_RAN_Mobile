@@ -57,19 +57,9 @@ class AuthVM : ViewModel() {
     suspend fun registration(fio: String, dep: String, email: String, password: String, authApi: AuthApi) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                withContext(Dispatchers.Main) {
-                    authApi.userRegistration(
-                        RegistrationModel(
-                            fio,
-                            dep,
-                            email,
-                            password
-                        )
-                    )
-                }
+                authApi.userRegistration(RegistrationModel(fio, dep, email, password))
             } catch (e: Exception) {
-                // Обработка ошибок
-                e.printStackTrace()
+                Log.e("AuthVM", "Registration error", e)
             }
         }
     }
@@ -77,27 +67,12 @@ class AuthVM : ViewModel() {
     suspend fun authorization(fio: String, dep: String, email: String, password: String, authApi: AuthApi) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-
-                withContext(Dispatchers.Main) {
-                    val userToken = authApi.userLogin(
-                        RegistrationModel(
-                            fio,
-                            dep,
-                            email,
-                            password
-                        )
-
-                    )
-                    Log.d("ВЕРНИ ТОКЕН ЗАРАЗА", userToken.token)
-                    // Установка токена после успешной аутентификации
-                    setToken(userToken.token)
-                }
+                val userToken = authApi.userLogin(RegistrationModel(fio, dep, email, password))
+                Log.d("AuthVM", "Token received: ${userToken.token}")
+                setToken(userToken.token)
             } catch (e: Exception) {
-                // Обработка ошибок
-                e.printStackTrace()
+                Log.e("AuthVM", "Authorization error", e)
             }
         }
     }
-
-
 }

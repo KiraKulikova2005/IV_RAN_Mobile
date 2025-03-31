@@ -65,6 +65,8 @@ dependencies {
     implementation("androidx.camera:camera-camera2:1.3.1")
     implementation("androidx.test:runner:1.5.2")
     implementation("androidx.compose.material3:material3-android:1.2.0")
+    implementation("com.google.firebase:firebase-crashlytics-buildtools:3.0.3")
+    implementation("androidx.compose.runtime:runtime-livedata:1.7.8")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
