@@ -30,6 +30,7 @@ import com.example.visionbook.models.FaceAnalyser
 import com.example.visionbook.models.NavigationItems
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.FlashToggleButton
 import com.example.visionbook.view.camerasBookNProfile.secondCameraScreens.CanceledPermissonScreen
+import com.example.visionbook.view.navigation.GraphRoute
 import java.io.File
 import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executor
@@ -231,7 +232,7 @@ fun BookCameraPreview(
                             onClick = {
                                 showDialog = false
                                 try {
-                                    navController.navigate(NavigationItems.NFCRead.route) {
+                                    navController.navigate(GraphRoute.NFC_READ) {
                                         launchSingleTop = true
                                     }
                                 } catch (e: Exception) {

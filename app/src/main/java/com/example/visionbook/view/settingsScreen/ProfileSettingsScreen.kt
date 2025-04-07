@@ -34,16 +34,24 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.visionbook.R
 import com.example.visionbook.data.ProfileSettingsItem
 import com.example.visionbook.models.AutoresizedText
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
-import com.example.visionbook.view.navigation.AuthScreen
+import com.example.visionbook.view.navigation.GraphRoute
+import com.example.visionbook.view.navigation.logoutAndNavigateToAuth
+import com.example.visionbook.viewmodels.AuthVM
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileSettingsScreen(navController: NavController) {
+fun ProfileSettingsScreen(
+    navController: NavController,
+    rootNavController: NavHostController,
+    authViewModel: AuthVM = viewModel()  // Добавляем параметр
+) {
     // Temporary mock data - replace with real data from database
     var profileData by remember {
         mutableStateOf(
@@ -103,7 +111,7 @@ fun ProfileSettingsScreen(navController: NavController) {
                     navController = navController,
                     onClick = { field ->
                         if (field == "Выход из профиля") {
-                            navController.navigate(AuthScreen.Login.route)
+                            rootNavController.logoutAndNavigateToAuth(authViewModel)
                         } else {
                             currentField = field
                             editedValue = profileData[field] ?: ""

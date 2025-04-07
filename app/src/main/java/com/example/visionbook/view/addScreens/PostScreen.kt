@@ -1,15 +1,11 @@
 package com.example.visionbook.view.addScreens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -24,15 +20,20 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role.Companion.Image
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.visionbook.R
 import com.example.visionbook.models.AutoresizedText
 import com.example.visionbook.models.NoRippleInteractionSource
 import com.example.visionbook.models.PostScreenVMFactory
+import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import com.example.visionbook.viewmodels.AuthVM
 import com.example.visionbook.viewmodels.BooksScreenVM
 import com.example.visionbook.viewmodels.ExoPlayerVM
@@ -41,97 +42,145 @@ import com.example.visionbook.viewmodels.ProfileScreenVM
 import com.google.android.exoplayer2.ui.PlayerView
 
 
+@OptIn(ExperimentalMaterial3Api::class) // Для TopAppBar
 @Composable
 fun Post(
-    playerViewModel: ExoPlayerVM = viewModel(),
+    navController: NavController, // NavController нужен для BackButton
+    // ViewModel пока убираем, т.к. используем заглушки
     authViewModel: AuthVM = viewModel()
-){
-    val userViewModel = viewModel<ProfileScreenVM>()
-    val bookViewModel = viewModel<BooksScreenVM>()
-    val postViewModel: PostScreenVM = viewModel<PostScreenVM>(factory = PostScreenVMFactory(userViewModel, bookViewModel))
+    // userViewModel: ProfileScreenVM = viewModel(),
+    // bookViewModel: BooksScreenVM = viewModel(),
+    // postViewModel: PostScreenVM = viewModel(...)
+) {
+    // --- Заглушки данных ---
+    val bookCoverResId = R.drawable.book_cover_placeholder // ЗАМЕНИТЕ на ваш placeholder drawable
+    val bookTitle = "Вехи конституционного пути Австралии (1788 - 2000 гг.)"
+    val bookAuthor = "Скоробогатых Н.С."
+    val bookStatus = "На месте"
+    val bookId = "73946295"
+    val bookIsbn = "5-89282-266-4"
+    val publisher = "Институт востоковедения РАН"
+    val year = "2006"
+    val pages = "240"
+    val address = "Москва"
+    val department = "ИВ РАН"
+    val floor = "2"
+    val cabinet = "219"
+    val bookcase = "2"
+    val shelf = "3"
+    // -----------------------
 
-    val context = LocalContext.current
-    val postItem = postViewModel.getPostItem()
-
-    if (postItem == null) {
-        CircularProgressIndicator()
-        return
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        val (exoPlayer, bitmap) = remember(postItem.videoUrl) {
-            playerViewModel.initializePlayer(postItem.videoUrl, context)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Книга") },
+                navigationIcon = {
+                    BackButton(navController = navController)
+                },
+                colors = TopAppBarDefaults.topAppBarColors( // Опционально: настройте цвета AppBar
+                    containerColor = MaterialTheme.colorScheme.background, // Или другой цвет
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+                )
+            )
         }
-
-        DisposableEffect(context) {
-            onDispose {
-                playerViewModel.releasePlayer()
-            }
-        }
-
-        AndroidView(
-            modifier = Modifier.fillMaxWidth(),
-            factory = { context ->
-                PlayerView(context).apply {
-                    player = exoPlayer ?: return@apply
-                    useController = true
-                }
-            }
-        )
-
-
-        Surface(modifier = Modifier.fillMaxWidth().padding(top = 200.dp),
-            shape = RoundedCornerShape(percent = 10)
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues) // Применяем отступы от Scaffold
+                .padding(horizontal = 16.dp) // Добавляем горизонтальные отступы для контента
+                .verticalScroll(rememberScrollState()) // Делаем колонку скроллящейся
         ) {
-            Column(modifier = Modifier.fillMaxSize()
-                .padding(start = 12.dp, end = 12.dp)) {
-                Row(modifier = Modifier.fillMaxWidth().padding(bottom = 30.dp, top = 10.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically) {
-                    AsyncImage(model = postItem.avatarUrl, "Avatar",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier.size(70.dp).clip(CircleShape))
-                    AutoresizedText(
-                        postItem.username,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    var checked by remember {
-                        mutableStateOf(false)
-                    }
-                    IconToggleButton(
-                        modifier = Modifier.padding(bottom = 10.dp, end = 10.dp)
-                            .then(
-                                Modifier.size(32.dp)
-                            ),
-                        checked = checked,
-                        onCheckedChange = { _checked ->
-                            checked = _checked
-                        },
-                        interactionSource = NoRippleInteractionSource()
-                    ) {
-                        Icon(
-                            painter = painterResource(R.drawable.like),
-                            "Like",
-                        )
-                    }
-                }
-                AutoresizedText("${stringResource(R.string.author)}: ${postItem.bookAuthor}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 7.dp))
-                AutoresizedText("${stringResource(R.string.name)}: ${postItem.bookTitle}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 7.dp))
-                AutoresizedText("${stringResource(R.string.genre)}: ${postItem.bookGenre}",
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier =  Modifier.padding(start = 8.dp, bottom = 40.dp))
-                AutoresizedText("${stringResource(R.string.post_text)}:",
-                    style = MaterialTheme.typography.labelLarge,
-                    modifier = Modifier.padding(start = 8.dp, bottom = 26.dp))
-                Text("     ${postItem.bookText}",
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 8.dp))
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Обложка книги
+            Image(
+                painter = painterResource(id = bookCoverResId),
+                contentDescription = bookTitle,
+                modifier = Modifier
+                    .height(200.dp) // Задайте желаемую высоту
+                    .fillMaxWidth(0.6f) // Занимает 60% ширины
+                    .align(Alignment.CenterHorizontally) // Центрируем по горизонтали
+                    .clip(RoundedCornerShape(8.dp)), // Слегка скругляем углы
+                contentScale = ContentScale.Fit // Или ContentScale.Crop, смотря что лучше
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Название книги
+            Text(
+                text = bookTitle,
+                style = MaterialTheme.typography.titleLarge, // Крупный шрифт для заголовка
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            // Автор книги
+            Text(
+                text = bookAuthor,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant, // Чуть менее яркий цвет
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Кнопка статуса
+            Button(
+                onClick = { /* TODO: Действие для кнопки статуса */ },
+                modifier = Modifier
+                    .fillMaxWidth(0.7f) // Занимает 70% ширины
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(15.dp)
+            ) {
+                Text(bookStatus)
             }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // --- Детали книги ---
+            Text("id: $bookId", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Название: $bookTitle", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Автор: $bookAuthor", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("ISBN: $bookIsbn", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Издательство: $publisher", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Год: $year", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Страницы: $pages", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Адрес: $address", style = MaterialTheme.typography.titleMedium)
+            // ---------------------
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // --- Место ---
+            Text(
+                text = "Место",
+                style = MaterialTheme.typography.titleLarge,// Заголовок секции
+                fontWeight = FontWeight.Bold // Делаем жирным
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Text("Подразделение: $department", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Этаж: $floor", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Кабинет: $cabinet", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Шкаф: $bookcase", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Полка: $shelf", style = MaterialTheme.typography.titleMedium)
+            // -------------
+
+            Spacer(modifier = Modifier.height(16.dp)) // Отступ снизу
         }
     }
 }
-

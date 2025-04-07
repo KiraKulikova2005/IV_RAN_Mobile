@@ -1,6 +1,5 @@
 package com.example.visionbook.view.mainScreens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,30 +8,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
+import androidx.navigation.NavHostController
 import com.example.visionbook.R
 import com.example.visionbook.data.MenuItem
 import com.example.visionbook.models.AutoresizedText
-import com.example.visionbook.models.NavigationItems
-import com.example.visionbook.view.authScreens.LoginScreen
-import com.example.visionbook.view.navigation.AuthScreen
 import com.example.visionbook.view.navigation.GraphRoute
-import com.example.visionbook.view.navigation.SettingsScreen
+import com.example.visionbook.view.navigation.logoutAndNavigateToAuth
 import com.example.visionbook.viewmodels.AuthVM
 import com.example.visionbook.viewmodels.ProfileScreenVM
 
 @Composable
 fun SettingsProfileScreen(
     navController: NavController,
+    rootNavController: NavHostController,
     onThemeUpdated: () -> Unit,
     viewModel: ProfileScreenVM = viewModel(),
-    authViewModel: AuthVM
+    authViewModel: AuthVM = viewModel()
 ) {
     val profileList = viewModel.profileList.value
     val firstProfile = profileList.firstOrNull()
@@ -42,7 +38,7 @@ fun SettingsProfileScreen(
             .padding(start = 22.dp, end = 22.dp)
     ) {
         Button(
-            onClick = { navController.navigate(GraphRoute.PROFILE) },
+            onClick = { navController.navigate(GraphRoute.PROFILE_VIEW) },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 20.dp),
@@ -102,7 +98,9 @@ fun SettingsProfileScreen(
                     contentDescription = menuItem.contentDescription,
                     text = menuItem.text,
                     onThemeUpdated,
-                    navController
+                    navController,
+                    rootNavController,
+                    authViewModel
                 )
             }
         }
@@ -115,7 +113,9 @@ fun MenuButton(
     contentDescription: String,
     text: String,
     onThemeUpdated: () -> Unit,
-    navController: NavController
+    navController: NavController,
+    rootNavController: NavHostController,
+    authViewModel: AuthVM
 ) {
     Button(
         onClick = {
@@ -125,23 +125,23 @@ fun MenuButton(
                 }
 
                 "Profile Settings" -> {
-                    navController.navigate(SettingsScreen.ProfileSettings.route)
+                    navController.navigate(GraphRoute.PROFILE_SETTINGS)
                 }
 
                 "Notification" -> {
-                    navController.navigate(SettingsScreen.Notification.route)
+                    navController.navigate(GraphRoute.NOTIFICATION)
                 }
 
                 "Security" -> {
-                    navController.navigate(SettingsScreen.Security.route)
+                    navController.navigate(GraphRoute.SECURITY)
                 }
 
                 "Exit" -> {
-                    navController.navigate(AuthScreen.Login.route)
+                    rootNavController.logoutAndNavigateToAuth(authViewModel)
                 }
 
                 "FAQ" -> {
-                    navController.navigate(SettingsScreen.FAQ.route)
+                    navController.navigate(GraphRoute.FAQ)
                 }
             }
         },

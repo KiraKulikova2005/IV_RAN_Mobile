@@ -1,6 +1,5 @@
 package com.example.visionbook.models.dataclasses
 
-
 data class RegModel(
     val status: String
 )

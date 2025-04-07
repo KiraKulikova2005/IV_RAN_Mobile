@@ -80,7 +80,7 @@ fun TopBar(navController: NavController, scrollBehavior: TopAppBarScrollBehavior
         },
         actions = {
             IconButton(
-                onClick = { viewModel.toggleSearchAndFilters() }
+                onClick = { viewModel.setSearchActive(true) }
             ) {
                 Icon(painter = painterResource(R.drawable.search), "searchTopBar")
             }

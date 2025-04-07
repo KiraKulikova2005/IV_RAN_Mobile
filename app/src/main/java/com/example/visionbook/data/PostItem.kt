@@ -6,8 +6,7 @@ data class PostItem(
     val bookTitle: String,
     val bookGenre: String,
     val bookAuthor: String,
-    val bookText: String,
-    val videoUrl: String
+    val bookText: String
 )
 
 object DataPost {

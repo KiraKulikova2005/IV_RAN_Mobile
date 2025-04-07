@@ -18,4 +18,13 @@ class SearchAndFiltersVM : ViewModel() {
     fun resetSearchState() {
         _showSearchAndFilters.value = false
     }
+
+    // Используем MutableState для простоты интеграции с Compose
+    val isSearchActive = mutableStateOf(false) // Изначально поиск не активен
+
+    fun setSearchActive(isActive: Boolean) {
+        isSearchActive.value = isActive
+    }
+
+    val searchQuery = mutableStateOf("")
 }

@@ -1,8 +1,7 @@
 package com.example.visionbook.models.api
 
-import com.example.visionbook.models.dataclasses.LogModel
-import com.example.visionbook.models.dataclasses.RegModel
-import com.example.visionbook.models.dataclasses.RegistrationModel
+import com.example.visionbook.models.dataclasses.*
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.Headers
 import retrofit2.http.POST

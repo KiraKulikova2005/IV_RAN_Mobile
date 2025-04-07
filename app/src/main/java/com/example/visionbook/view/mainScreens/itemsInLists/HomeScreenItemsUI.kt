@@ -12,6 +12,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.visionbook.data.DataBooksScreen
 import com.example.visionbook.models.NavigationItems
+import com.example.visionbook.view.navigation.GraphRoute
 import com.example.visionbook.viewmodels.AuthVM
 
 @Composable
@@ -24,7 +25,7 @@ fun HomeScreenItems(navController: NavController, authViewModel: AuthVM) {
     ) {
         Box(contentAlignment = Alignment.BottomEnd,
             modifier = Modifier.clickable {
-                navController.navigate(NavigationItems.Post.route)
+                navController.navigate(GraphRoute.POST)
             }
         ) {
             // bitmap?.let {

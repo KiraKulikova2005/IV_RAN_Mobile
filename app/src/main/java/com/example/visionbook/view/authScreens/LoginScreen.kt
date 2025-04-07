@@ -14,7 +14,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,51 +21,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.visionbook.R
 import com.example.visionbook.models.AutoresizedText
-import com.example.visionbook.models.api.AuthApi
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldEmail
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldPass
-import com.example.visionbook.view.navigation.AuthScreen
 import com.example.visionbook.view.navigation.GraphRoute
 import com.example.visionbook.viewmodels.AuthVM
-import com.example.visionbook.viewmodels.RetrofitVM
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
 @Composable
 fun LoginScreen(
     navController: NavController,
-    authViewModel: AuthVM,
-    retrofitViewModel: RetrofitVM = viewModel()
+    authViewModel: AuthVM = viewModel() // ViewModel для управления состоянием
 ) {
-    val context = LocalContext.current
-    val authApi = retrofitViewModel.retrofit.create(AuthApi::class.java)
     val emailState = remember { mutableStateOf("") }
     val passwordState = remember { mutableStateOf("") }
-    val checkEmailPass = stringResource(R.string.check_email_pass)
-    // Забираем значения из вьюмодели
-    DisposableEffect(authViewModel) {
-
-        val observerEmailState = Observer<String> { _emailState ->
-            emailState.value = _emailState
-        }
-        authViewModel.emailState.observeForever(observerEmailState)
-
-        val observerPasswordState = Observer<String> { _passwordState ->
-            passwordState.value = _passwordState
-        }
-        authViewModel.passwordState.observeForever(observerPasswordState)
-        onDispose {
-            authViewModel.emailState.removeObserver(observerEmailState)
-            authViewModel.passwordState.removeObserver(observerPasswordState)
-        }
-    }
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -97,40 +69,34 @@ fun LoginScreen(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .padding(top = 10.dp, bottom = 80.dp)
-                .clickable { navController.navigate(AuthScreen.Forgot.route) }
+                .clickable { navController.navigate(GraphRoute.FORGOT) }
         )
         Button(
             onClick = {
-                // Закомментирована проверка введенных данных
-                // if (emailState.value != "" && passwordState.value != "") {
-                //    CoroutineScope(Dispatchers.IO).launch {
-                //        authViewModel.authorization(
-                //            emailState.value, passwordState.value, authApi.toString(),
-                //            password = TODO(),
-                //            authApi = TODO()
-                //        )
-                //    }
-                //    navController.navigate(GraphRoute.MAIN) {
-                //        navController.popBackStack()
-                //    }
-                // } else {
-                //    Toast.makeText(
-                //        context,
-                //        checkEmailPass,
-                //        Toast.LENGTH_SHORT
-                //    ).show()
-                // }
+                // Упрощенная проверка - вход разрешен при любых непустых данных
+                if (emailState.value.isNotEmpty() && passwordState.value.isNotEmpty()) {
+                    // "Фейковая" авторизация - генерируем случайный токен
+                    val fakeToken = "fake_token_${System.currentTimeMillis()}"
 
-                // Просто переход на главный экран
-                navController.navigate(GraphRoute.MAIN) {
-                    navController.popBackStack()
+                    // Сохраняем состояние входа в ViewModel
+                    authViewModel.loginSuccess(fakeToken)
+
+                    // Переходим на главный экран
+                    navController.navigate(GraphRoute.MAIN) {
+                        popUpTo(GraphRoute.AUTH) { inclusive = true }
+                    }
+                    //navController.navigate(GraphRoute.MAIN) {
+                    //    navController.popBackStack()
+                    //}
+                } else {
+                    Toast.makeText(context, "Введите email и пароль", Toast.LENGTH_SHORT).show()
                 }
             },
             shape = RoundedCornerShape(30),
             modifier = Modifier
                 .width(140.dp)
                 .height(70.dp)
-        ) {
+        )  {
             AutoresizedText(
                 stringResource(R.string.sign_in_button),
                 style = MaterialTheme.typography.labelMedium
@@ -150,7 +116,7 @@ fun LoginScreen(
                 style = MaterialTheme.typography.titleSmall,
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.clickable {
-                    navController.navigate(AuthScreen.Registration.route)
+                    navController.navigate(GraphRoute.REGISTRATION)
                 }
             )
         }
@@ -161,9 +127,7 @@ fun LoginScreen(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .padding(top = 10.dp, bottom = 80.dp)
-                .clickable { navController.navigate(AuthScreen.NFC.route) }
+                .clickable { navController.navigate(GraphRoute.NFC) }
         )
-
     }
-
 }

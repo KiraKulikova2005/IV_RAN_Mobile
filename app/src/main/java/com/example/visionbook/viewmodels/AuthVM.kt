@@ -8,6 +8,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.visionbook.models.api.AuthApi
 import com.example.visionbook.models.dataclasses.RegistrationModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -23,15 +26,15 @@ class AuthVM : ViewModel() {
     private val _secondPasswordState = MutableLiveData<String>()
     val secondPasswordState: LiveData<String> = _secondPasswordState
 
+    private val _isAuthenticated = MutableStateFlow<Boolean?>(null)
+    val isAuthenticated: StateFlow<Boolean?> = _isAuthenticated.asStateFlow()
 
-    private val _tokenState = MutableLiveData<String>()
+
+    private val _tokenState = MutableLiveData("")
     val tokenState: LiveData<String> = _tokenState
 
-    private val _isAuthenticated = MutableLiveData<Boolean>(false)
-    val isAuthenticated: LiveData<Boolean> = _isAuthenticated
-
     fun loginSuccess(token: String) {
-        setToken(token)
+        _tokenState.value = token
         _isAuthenticated.value = true
     }
 
@@ -41,6 +44,13 @@ class AuthVM : ViewModel() {
         _isAuthenticated.value = false
         _emailState.value = ""
         _passwordState.value = ""
+        _fioState.value = ""
+        _depState.value = ""
+        _secondPasswordState.value = ""
+    }
+
+    fun setAuthenticated(authenticated: Boolean) {
+        _isAuthenticated.value = authenticated
     }
 
     fun checkPasswordMatch(password: String, secondPassword: String?): Boolean {
@@ -74,5 +84,9 @@ class AuthVM : ViewModel() {
                 Log.e("AuthVM", "Authorization error", e)
             }
         }
+    }
+
+    fun login() {
+        _isAuthenticated.value = true
     }
 }

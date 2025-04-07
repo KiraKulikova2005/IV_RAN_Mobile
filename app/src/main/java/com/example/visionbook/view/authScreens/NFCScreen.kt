@@ -24,17 +24,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.visionbook.R
 import com.example.visionbook.models.NavigationItems
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
+import com.example.visionbook.viewmodels.AuthVM
 import java.nio.charset.Charset
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.experimental.and
 
 @Composable
-fun NFCScreen(navController: NavController) {
+fun NFCScreen(navController: NavHostController,
+              authViewModel: AuthVM = viewModel()) {
     val context = LocalContext.current
     val activity = context as Activity
     val nfcAdapter = NfcAdapter.getDefaultAdapter(context)

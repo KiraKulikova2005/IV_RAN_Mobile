@@ -2,12 +2,10 @@ package com.example.visionbook.view.camerasBookNProfile
 
 import android.content.Context
 import android.net.Uri
-import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -15,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -24,7 +21,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.example.visionbook.R
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
-import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.ButtonCaptureImage
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.FlashToggleButton
 import com.example.visionbook.view.navigation.GraphRoute
 import com.google.mlkit.vision.barcode.BarcodeScanning

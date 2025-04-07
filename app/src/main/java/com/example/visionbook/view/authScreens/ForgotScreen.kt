@@ -24,7 +24,7 @@ import com.example.visionbook.models.AutoresizedText
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.BackButton
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldCustom
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldEmail
-import com.example.visionbook.view.navigation.AuthScreen
+import com.example.visionbook.view.navigation.GraphRoute
 import com.example.visionbook.viewmodels.AuthVM
 
 
@@ -64,8 +64,8 @@ fun ForgotScreen(navController: NavController, authViewModel: AuthVM) {
         Button(
             onClick = {
                 if (emailState.value != "") {
-                    navController.navigate(AuthScreen.Login.route) {
-                        navController.popBackStack(AuthScreen.Login.route, true)
+                    navController.navigate(GraphRoute.LOGIN) {
+                        navController.popBackStack(GraphRoute.LOGIN, true)
                     }
                 } else {
                     Toast.makeText(

@@ -34,7 +34,6 @@ import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldE
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldPass
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldFio
 import com.example.visionbook.view.camerasBookNProfile.itemsInCameras.TextFieldDep
-import com.example.visionbook.view.navigation.AuthScreen
 import com.example.visionbook.view.navigation.GraphRoute
 import com.example.visionbook.viewmodels.AuthVM
 import com.example.visionbook.viewmodels.RetrofitVM
@@ -196,7 +195,7 @@ fun RegistrationScreen(
                         )
                     }
                     navController.navigate(GraphRoute.MAIN) {
-                        navController.popBackStack(AuthScreen.Login.route, true)
+                        navController.popBackStack(GraphRoute.LOGIN, true)
                     }
                 } else if (passwordState.value == "" || emailState.value == "") {
                     Toast.makeText(

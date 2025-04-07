@@ -20,7 +20,6 @@ class PostScreenVM(
 
         // Выбираем случайный текст из списка
         val bookText = DataPost.textList.random()
-        val videoUrl = DataPost.videoUrlList.random()
         if (bookTitle != null && bookGenre != null && bookAuthor != null) {
             return PostItem(
                 username = username,
@@ -28,8 +27,7 @@ class PostScreenVM(
                 bookTitle = bookTitle,
                 bookGenre = bookGenre,
                 bookAuthor = bookAuthor,
-                bookText = bookText,
-                videoUrl = videoUrl
+                bookText = bookText
             )
         } else {
             return PostItem(
@@ -38,8 +36,7 @@ class PostScreenVM(
                 bookTitle = "Title empty",
                 bookGenre = "Genre empty",
                 bookAuthor = "Author empty",
-                bookText = bookText,
-                videoUrl = videoUrl
+                bookText = bookText
             )
         }
 
@@ -48,11 +45,10 @@ class PostScreenVM(
     fun getPostItemsList(size: Int): List<PostItem> {
         val postItems = mutableListOf<PostItem>()
         repeat(size) {
-            val postItem = getPostItem()
-            postItems.add(postItem)
+            getPostItem()?.let { postItem ->
+                postItems.add(postItem)
+            }
         }
         return postItems
     }
-
-
 }
